@@ -38,12 +38,21 @@ jobs:
       - name: MetricFlow validate-configs
         run: mf validate-configs
 
+      - name: Skill ⇄ metric crosswalk
+        run: python scripts/skill_metric_crosswalk.py
+
       - name: Metric smoke queries
         run: |
-          mf query --metrics arr              --group-by metric_time__month
-          mf query --metrics net_new_arr      --group-by metric_time__month
-          mf query --metrics win_rate         --group-by metric_time__quarter,opportunity__owner_team
-          mf query --metrics pipeline_coverage --group-by metric_time__quarter,team
+          mf query --metrics arr                   --group-by metric_time__month
+          mf query --metrics net_new_arr           --group-by metric_time__month
+          mf query --metrics nrr                   --group-by metric_time__month,cohort_arr__cohort_month
+          mf query --metrics logo_retention        --group-by metric_time__month,cohort_arr__cohort_month
+          mf query --metrics win_rate              --group-by metric_time__quarter,opportunity__owner_team
+          mf query --metrics pipeline_coverage     --group-by metric_time__quarter,team
+          mf query --metrics pipeline_coverage_qtd --group-by metric_time__quarter,team
+          mf query --metrics activation_rate       --group-by metric_time__week
+          mf query --metrics cac_payback_months    --group-by metric_time__quarter
+          mf query --metrics gross_margin          --group-by metric_time__quarter
 
       - name: SQL lint
         run: sqlfluff lint models/ --dialect duckdb

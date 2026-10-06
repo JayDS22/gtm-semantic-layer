@@ -2,7 +2,7 @@ version: 2
 
 semantic_models:
   - name: opportunity
-    description: One row per opportunity (current state). Facts for win_rate, pipeline_coverage, avg_sales_cycle, and the funnel metrics that join through account.
+    description: One row per opportunity (current state). Facts for win_rate, pipeline_coverage(_qtd), weighted_pipeline, avg_sales_cycle, and funnel metrics joining through account.
     model: ref('fct_opportunity')
     defaults:
       agg_time_dimension: close_date
@@ -32,6 +32,27 @@ semantic_models:
       - name: open_pipeline_arr_cents
         agg: sum
         expr: "case when is_open and forecast_category in ('pipeline','best_case','commit') then arr_cents else 0 end"
+      - name: qtd_pipeline_arr_cents
+        agg: sum
+        expr: "case when (is_open and forecast_category in ('pipeline','best_case','commit')) or is_won then arr_cents else 0 end"
+      - name: weighted_pipeline_arr_cents
+        agg: sum
+        expr: |
+          case
+            when stage = 'Prospecting'   then arr_cents * 0.10
+            when stage = 'Qualification' then arr_cents * 0.20
+            when stage = 'Discovery'     then arr_cents * 0.30
+            when stage = 'Proposal'      then arr_cents * 0.50
+            when stage = 'Negotiation'   then arr_cents * 0.70
+            when stage = 'Closed Won'    then arr_cents * 1.00
+            else 0
+          end
+      - name: cycle_days_sum
+        agg: sum
+        expr: coalesce(cycle_days, 0)
+      - name: n_closed_with_cycle
+        agg: sum
+        expr: "case when cycle_days is not null then 1 else 0 end"
     dimensions:
       - name: close_date
         type: time
@@ -50,34 +71,46 @@ semantic_models:
 
 metrics:
   - name: won_opps
-    description: Count of won opportunities by close date.
     type: simple
     type_params:
       measure: { name: n_won }
     label: "Won opps"
 
   - name: lost_opps
-    description: Count of lost opportunities by close date.
     type: simple
     type_params:
       measure: { name: n_lost }
     label: "Lost opps"
 
   - name: closed_opps
-    description: Count of closed opportunities (won + lost) by close date.
     type: simple
     type_params:
       measure: { name: n_closed }
-    label: "Closed opps"
+    label: "Closed opps (won+lost)"
 
   - name: open_pipeline_arr
-    description: Sum of ARR on OPEN opportunities whose forecast_category is in (pipeline, best_case, commit), grouped by close date. Deliberately excludes closed_won — see pipeline_coverage gotcha.
+    description: Sum of ARR on OPEN opps whose forecast_category ∈ (pipeline, best_case, commit), by close_date. Strict numerator for pipeline_coverage.
     type: simple
     type_params:
       measure: { name: open_pipeline_arr_cents }
     label: "Open pipeline ARR ($)"
-    config:
-      meta: { unit: usd, divide_by: 100 }
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: qtd_pipeline_arr
+    description: Open pipeline + closed_won in-period. Numerator for pipeline_coverage_qtd (adversarial-pass sibling metric).
+    type: simple
+    type_params:
+      measure: { name: qtd_pipeline_arr_cents }
+    label: "QTD pipeline ARR ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: weighted_pipeline_arr
+    description: Sum of (opp ARR × stage probability). Probabilities Prospecting .10, Qualification .20, Discovery .30, Proposal .50, Negotiation .70, Closed Won 1.00, Closed Lost 0.
+    type: simple
+    type_params:
+      measure: { name: weighted_pipeline_arr_cents }
+    label: "Weighted pipeline ARR ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
 
   - name: win_rate
     description: Won opps / (won + lost opps). Natural grain = team × close_date (default rolled to quarter).
@@ -86,5 +119,26 @@ metrics:
       numerator: { name: won_opps }
       denominator: { name: closed_opps }
     label: "Win rate"
-    config:
-      meta: { owner: gtm-analytics@example.com }
+    config: { meta: { owner: gtm-analytics@example.com } }
+
+  - name: cycle_days_total
+    type: simple
+    type_params:
+      measure: { name: cycle_days_sum }
+    label: "Cycle days (sum across closed opps)"
+
+  - name: closed_opps_with_cycle
+    type: simple
+    type_params:
+      measure: { name: n_closed_with_cycle }
+    label: "Closed opps with non-null cycle"
+
+  - name: avg_sales_cycle_days
+    description: Mean days from created_date to close_date on closed (won+lost) opps.
+    type: derived
+    type_params:
+      expr: cycle_days_total * 1.0 / nullif(closed_opps_with_cycle, 0)
+      metrics:
+        - { name: cycle_days_total }
+        - { name: closed_opps_with_cycle }
+    label: "Avg sales cycle (days)"

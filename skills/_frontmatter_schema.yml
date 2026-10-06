@@ -1,0 +1,21 @@
+# skills/_frontmatter_schema.yml
+# JSON-schema-like description of the YAML frontmatter required at the top of
+# every skills/*/*.md file. Consumed by scripts/skill_metric_crosswalk.py.
+
+required:
+  - metric_id         # required for skills/metrics/*.md; omit for debug/faq
+  - category          # metric | debug | faq
+  - owner             # email
+  - confidence_tier   # stable | evolving | draft
+  - pii_sensitive     # boolean
+  - last_reviewed_at  # YYYY-MM-DD
+  - update_cadence    # weekly | monthly | quarterly | on_change
+
+optional:
+  - dimensions        # list[string] — safe grouping dims for the assistant
+  - related_skills    # list[string] — kebab-case ids pointing at other files
+
+enforcement:
+  - scripts/skill_metric_crosswalk.py — every mf metric must have a
+    skills/metrics/<id>.md and vice versa (via metric_id frontmatter)
+  - scripts/skill_freshness.py (Day 4+) — warn if last_reviewed_at > 90d

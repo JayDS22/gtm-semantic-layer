@@ -113,3 +113,45 @@ models:
         tests: [not_null]
       - name: quota_arr_cents
         tests: [not_null]
+
+  - name: fct_funnel_event
+    description: Classified product funnel events, one row per event.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: funnel_stage
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [visit, signup, mql, sql, activation, expansion]
+      - name: event_at
+        tests: [not_null]
+
+  - name: fct_financials
+    description: Quarterly S&M spend, revenue, COGS, net burn, margins.
+    columns:
+      - name: financials_sk
+        tests: [not_null, unique]
+      - name: quarter_start
+        tests: [not_null, unique]
+      - name: sm_spend_cents
+        tests: [not_null]
+      - name: revenue_cents
+        tests: [not_null]
+
+  - name: fct_cohort_arr_monthly
+    description: Cohort-static ARR aggregation. One row per (cohort_month × reporting_month).
+    tests:
+      - assert_grain:
+          arguments:
+            columns: [cohort_month, reporting_month]
+    columns:
+      - name: cohort_month
+        tests: [not_null]
+      - name: reporting_month
+        tests: [not_null]
+      - name: cohort_t0_arr_cents
+        tests: [not_null]
+      - name: cohort_logo_t0
+        tests: [not_null]

@@ -1,0 +1,133 @@
+version: 2
+
+semantic_models:
+  - name: financials
+    description: Quarterly S&M spend, revenue, COGS, net burn, and margin percentages. Powers the efficiency metrics (CAC payback, magic number, burn multiple, gross margin, rule of 40).
+    model: ref('fct_financials')
+    primary_entity: financials_row
+    defaults:
+      agg_time_dimension: quarter_start
+    measures:
+      - name: sm_spend_cents_sum
+        agg: sum
+        expr: sm_spend_cents
+      - name: revenue_cents_sum
+        agg: sum
+        expr: revenue_cents
+      - name: cogs_cents_sum
+        agg: sum
+        expr: cogs_cents
+      - name: net_burn_cents_sum
+        agg: sum
+        expr: net_burn_cents
+      - name: gross_margin_pct_avg
+        agg: average
+        expr: gross_margin_pct
+      - name: operating_margin_pct_avg
+        agg: average
+        expr: operating_margin_pct
+    dimensions:
+      - name: quarter_start
+        type: time
+        type_params:
+          time_granularity: quarter
+
+metrics:
+  - name: sm_spend
+    type: simple
+    type_params:
+      measure: { name: sm_spend_cents_sum }
+    label: "S&M spend ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: revenue
+    type: simple
+    type_params:
+      measure: { name: revenue_cents_sum }
+    label: "Revenue ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: cogs
+    type: simple
+    type_params:
+      measure: { name: cogs_cents_sum }
+    label: "COGS ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: net_burn
+    type: simple
+    type_params:
+      measure: { name: net_burn_cents_sum }
+    label: "Net burn ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: gross_margin_pct_metric
+    type: simple
+    type_params:
+      measure: { name: gross_margin_pct_avg }
+    label: "Gross margin pct (seed-provided)"
+
+  - name: operating_margin_pct_metric
+    type: simple
+    type_params:
+      measure: { name: operating_margin_pct_avg }
+    label: "Operating margin pct"
+
+  - name: gross_profit
+    description: Revenue minus COGS.
+    type: derived
+    type_params:
+      expr: revenue - cogs
+      metrics:
+        - { name: revenue }
+        - { name: cogs }
+    label: "Gross profit ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: gross_margin
+    description: (revenue − cogs) / revenue. The computed ratio.
+    type: ratio
+    type_params:
+      numerator: { name: gross_profit }
+      denominator: { name: revenue }
+    label: "Gross margin"
+
+  - name: magic_number
+    description: Simplified SaaS magic number — net_new_arr × 4 / sm_spend. Textbook is (ARR_Q − ARR_{Q-1}) × 4 / S&M_{Q-1} (lag the S&M); we use same-period S&M for Day 3 simplicity.
+    type: derived
+    type_params:
+      expr: net_new_arr * 4.0 / nullif(sm_spend, 0)
+      metrics:
+        - { name: net_new_arr }
+        - { name: sm_spend }
+    label: "Magic number"
+
+  - name: burn_multiple
+    description: net_burn / net_new_arr. Lower is better; >2 is a warning threshold.
+    type: derived
+    type_params:
+      expr: 1.0 * net_burn / nullif(net_new_arr, 0)
+      metrics:
+        - { name: net_burn }
+        - { name: net_new_arr }
+    label: "Burn multiple"
+
+  - name: cac_payback_months
+    description: Blended CAC payback — 12 × sm_spend / (new_arr × gross_margin_pct). The design-doc §2.3 metric 16 formula is segment-weighted (per-segment GM × segment mix); Day 3 ships blended because per-segment GM and mix seeds don't exist yet.
+    type: derived
+    type_params:
+      expr: 12.0 * sm_spend / nullif(new_arr * gross_margin_pct_metric, 0)
+      metrics:
+        - { name: sm_spend }
+        - { name: new_arr }
+        - { name: gross_margin_pct_metric }
+    label: "CAC payback (months)"
+
+  - name: rule_of_40
+    description: Day 3 simplification — operating_margin_pct × 100 ONLY. The real metric adds trailing-12-month ARR growth as a percent; growth-rate-as-metric requires a fct_arr_qoq_growth mart (Day 4+). Under-reports growing-but-unprofitable companies.
+    type: derived
+    type_params:
+      expr: operating_margin_pct_metric * 100.0
+      metrics:
+        - { name: operating_margin_pct_metric }
+    label: "Rule of 40 (partial — operating margin only)"

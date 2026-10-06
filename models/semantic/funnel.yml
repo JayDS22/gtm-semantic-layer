@@ -1,0 +1,110 @@
+version: 2
+
+semantic_models:
+  - name: funnel_event
+    description: Product funnel events. One row per event_id. Account-grain analysis supported via account entity; the external user_id is a dimension, not resolved against sfdc_users (product and sales user namespaces are distinct).
+    model: ref('fct_funnel_event')
+    defaults:
+      agg_time_dimension: event_date
+    entities:
+      - name: funnel_event
+        type: primary
+        expr: event_id
+      - name: account
+        type: foreign
+        expr: account_sk
+    measures:
+      - name: n_visits
+        agg: count_distinct
+        expr: "case when funnel_stage = 'visit' then external_user_id else null end"
+      - name: n_signups
+        agg: count_distinct
+        expr: "case when funnel_stage = 'signup' then external_user_id else null end"
+      - name: n_mqls
+        agg: count_distinct
+        expr: "case when funnel_stage = 'mql' then external_user_id else null end"
+      - name: n_sqls
+        agg: count_distinct
+        expr: "case when funnel_stage = 'sql' then external_user_id else null end"
+      - name: n_activations
+        agg: count_distinct
+        expr: "case when funnel_stage = 'activation' then external_user_id else null end"
+      - name: n_funnel_wons
+        agg: count_distinct
+        expr: "case when funnel_stage = 'expansion' then external_user_id else null end"
+    dimensions:
+      - name: event_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: funnel_stage
+        type: categorical
+
+metrics:
+  - name: funnel_visits
+    type: simple
+    type_params:
+      measure: { name: n_visits }
+    label: "Funnel visits (distinct users)"
+
+  - name: funnel_signups
+    type: simple
+    type_params:
+      measure: { name: n_signups }
+    label: "Funnel signups (distinct users)"
+
+  - name: funnel_mqls
+    type: simple
+    type_params:
+      measure: { name: n_mqls }
+    label: "Funnel MQLs (distinct users)"
+
+  - name: funnel_sqls
+    type: simple
+    type_params:
+      measure: { name: n_sqls }
+    label: "Funnel SQLs (distinct users)"
+
+  - name: funnel_activations
+    type: simple
+    type_params:
+      measure: { name: n_activations }
+    label: "Funnel activations (distinct users)"
+
+  - name: funnel_wons
+    type: simple
+    type_params:
+      measure: { name: n_funnel_wons }
+    label: "Funnel wons (proxy via expansion events)"
+
+  - name: mql_to_sql_conv
+    description: SQLs over MQLs in the same cohort period. Rough proxy — real cohort tracking requires joining each user's MQL event to their SQL event (may be weeks apart). Day 4+.
+    type: ratio
+    type_params:
+      numerator: { name: funnel_sqls }
+      denominator: { name: funnel_mqls }
+    label: "MQL→SQL conv rate"
+
+  - name: sql_to_won_conv
+    description: Wons over SQLs in the same cohort period. Proxy — funnel_wons uses expansion_event as a stand-in since product events don't yet join to fct_opportunity.
+    type: ratio
+    type_params:
+      numerator: { name: funnel_wons }
+      denominator: { name: funnel_sqls }
+    label: "SQL→Won conv rate"
+
+  - name: mql_to_won_conv
+    description: Wons over MQLs in the same cohort period. Same expansion-event proxy as sql_to_won_conv.
+    type: ratio
+    type_params:
+      numerator: { name: funnel_wons }
+      denominator: { name: funnel_mqls }
+    label: "MQL→Won conv rate"
+
+  - name: activation_rate
+    description: Activations over signups in the same cohort period. A user "activated" on the first activation_milestone_reached event (first_query by default).
+    type: ratio
+    type_params:
+      numerator: { name: funnel_activations }
+      denominator: { name: funnel_signups }
+    label: "Activation rate"

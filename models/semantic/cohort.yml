@@ -1,0 +1,114 @@
+version: 2
+
+semantic_models:
+  - name: cohort_arr
+    description: Cohort-static ARR aggregation. One row per (cohort_month × reporting_month). Powers NRR, GRR, expansion rate, and logo retention — all with cohort-static attribution (new logos acquired in-period do NOT backfill prior cohorts).
+    model: ref('fct_cohort_arr_monthly')
+    primary_entity: cohort_arr_row
+    defaults:
+      agg_time_dimension: reporting_month
+    measures:
+      - name: cohort_now_arr_cents_sum
+        agg: sum
+        expr: cohort_now_arr_cents
+      - name: cohort_retained_arr_cents_sum
+        agg: sum
+        expr: cohort_retained_arr_cents
+      - name: cohort_t0_arr_cents_sum
+        agg: sum
+        expr: cohort_t0_arr_cents
+      - name: cohort_expansion_arr_cents_sum
+        agg: sum
+        expr: cohort_now_arr_cents - cohort_retained_arr_cents
+      - name: cohort_logo_t0_sum
+        agg: sum
+        expr: cohort_logo_t0
+      - name: cohort_logo_now_sum
+        agg: sum
+        expr: cohort_logo_now
+    dimensions:
+      - name: reporting_month
+        type: time
+        type_params:
+          time_granularity: month
+      - name: cohort_month
+        type: time
+        type_params:
+          time_granularity: month
+
+metrics:
+  - name: cohort_now_arr
+    type: simple
+    type_params:
+      measure: { name: cohort_now_arr_cents_sum }
+    label: "Cohort now ARR ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: cohort_retained_arr
+    type: simple
+    type_params:
+      measure: { name: cohort_retained_arr_cents_sum }
+    label: "Cohort retained ARR ($, capped at t0 per account)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: cohort_t0_arr
+    type: simple
+    type_params:
+      measure: { name: cohort_t0_arr_cents_sum }
+    label: "Cohort t0 ARR ($)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: cohort_expansion_arr
+    type: simple
+    type_params:
+      measure: { name: cohort_expansion_arr_cents_sum }
+    label: "Cohort expansion ARR ($, above-t0 portion)"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
+  - name: cohort_logo_t0_count
+    type: simple
+    type_params:
+      measure: { name: cohort_logo_t0_sum }
+    label: "Cohort logo count at t0"
+
+  - name: cohort_logo_now_count
+    type: simple
+    type_params:
+      measure: { name: cohort_logo_now_sum }
+    label: "Cohort logo count at reporting month (still paying)"
+
+  - name: nrr
+    description: Net revenue retention. cohort_now_arr / cohort_t0_arr. Cohort-static attribution — expansion from NEW logos in-period is NOT credited here.
+    type: ratio
+    type_params:
+      numerator: { name: cohort_now_arr }
+      denominator: { name: cohort_t0_arr }
+    label: "NRR"
+    config:
+      meta:
+        owner: gtm-analytics@example.com
+        gotcha: "Denominator freezes at t0. See skills/debug/nrr-cohort-attribution.md."
+
+  - name: grr
+    description: Gross revenue retention. cohort_retained_arr / cohort_t0_arr, where retained = min(curr_arr, t0_arr) per account (so GRR cannot exceed 1).
+    type: ratio
+    type_params:
+      numerator: { name: cohort_retained_arr }
+      denominator: { name: cohort_t0_arr }
+    label: "GRR"
+
+  - name: expansion_rate
+    description: Cohort expansion ARR / cohort t0 ARR. The above-t0-floor portion of the cohort's current ARR.
+    type: ratio
+    type_params:
+      numerator: { name: cohort_expansion_arr }
+      denominator: { name: cohort_t0_arr }
+    label: "Expansion rate"
+
+  - name: logo_retention
+    description: Share of cohort accounts still paying at reporting month. Dollar-agnostic.
+    type: ratio
+    type_params:
+      numerator: { name: cohort_logo_now_count }
+      denominator: { name: cohort_logo_t0_count }
+    label: "Logo retention"

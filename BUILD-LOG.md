@@ -1,5 +1,50 @@
 # BUILD-LOG
 
+## Day 3 — 2026-10-06
+
+**Shipped (morning — semantic layer expansion):**
+- 3 new semantic models:
+  - `sm_funnel_event` (sm + 4 funnel/activation metrics: mql_to_sql_conv, sql_to_won_conv, mql_to_won_conv, activation_rate; funnel_wons uses expansion_event as proxy — honest limitation flagged in skill files)
+  - `sm_cohort_arr` (sm + NRR, GRR, expansion_rate, logo_retention + 6 supporting measures via fct_cohort_arr_monthly)
+  - `sm_financials` (sm + sm_spend, revenue, cogs, net_burn, gross_margin + magic_number, burn_multiple, cac_payback_months blended, rule_of_40 operating-margin-only)
+- `sm_opportunity` expanded with avg_sales_cycle_days (derived), weighted_pipeline_arr (new measure using hardcoded 7-stage probability map), qtd_pipeline_arr (new measure)
+- `sm_quota` adds pipeline_coverage_qtd (adversarial-pass sibling metric per design doc §4)
+
+**Shipped (afternoon — skills folder):**
+- Fanned out 4 agents in parallel to write 22 metric skill files (6+6+5+5). All conform to the exemplar structure (frontmatter + 7 sections, 150-250 words). Honest `confidence_tier` labels: `stable` for well-defined formulas with reliable data, `evolving` for formulas with proxy data (3 funnel conversions), `draft` for formulas with material data gaps (cac_payback_months blended-not-segment-weighted, rule_of_40 operating-margin-only).
+- 3 debug files: `why-did-arr-move`, `nrr-cohort-attribution`, `pipeline-stage-regression`
+- 4 FAQ files: `what-is-mrr-vs-arr`, `what-counts-as-expansion`, `how-do-we-define-churn`, `pipeline-coverage-strict-vs-qtd` (last one carries the adversarial-pass drift note)
+- `skills/_frontmatter_schema.yml` as the YAML-schema reference
+- `scripts/skill_metric_crosswalk.py` — orphan check (every skill file maps to a real mf metric). Deliberately NOT a "missing" check — many mf metrics are supporting (new_arr, cohort_now_arr, etc.) and don't need skill files per design doc §1.6 (public-only convention)
+
+**CI additions:**
+- `python scripts/skill_metric_crosswalk.py` step after `mf validate-configs`
+- Smoke queries expanded to 10 metrics (arr, net_new_arr, nrr, logo_retention, win_rate, pipeline_coverage, pipeline_coverage_qtd, activation_rate, cac_payback_months, gross_margin) — representative of each sm
+
+**Design-doc location deviation:** Design doc §1.2 places `semantic/` at project root; using `models/semantic/` for dbt-path simplicity (no change to `model-paths` in `dbt_project.yml` required). Functionally equivalent for a reviewer skimming the repo. Refactor cost = ~5 min if a reviewer flags.
+
+**Deferred to Day 4+ (standard plan):**
+- Jaffle Shop seeds + `stg_jaffle__*` + `fct_order` + sm_order
+- `fct_subscription_period` (sub × status period grain)
+- Reactivation detection in fct_mrr_movement (separate from `new` classification)
+- Segment-weighted CAC payback (requires per-segment gross margin + segment mix seeds)
+- Rule of 40 growth-rate term (requires `fct_arr_qoq_growth` mart)
+- dbt snapshot on `stg_sfdc__opportunities` → true SCD2 for stage transitions → `fct_opportunity_stage_transition` fact
+- Macros for cross-sm metric time alignment refinement (if MF trips on cross-sm time grain mismatches at run time)
+
+**Adversarial-pass mods remaining:**
+- Day 4: ARR↔billed-revenue reconciliation singular test (~1h; highest-signal test for signalling real experience)
+- Day 5: `docs/example-trace.md` with Slack-shaped round-trip (user Q → skill selected → `mf query` → tabular → one-sentence answer; the single highest-leverage artifact per design doc §4)
+
+**Carries / risks:**
+- Cross-sm derived metrics (magic_number, burn_multiple, cac_payback_months) reference metrics from different semantic models (`net_new_arr` from mrr_movement, `sm_spend` from financials). MetricFlow should resolve these across YAML files via metric names, but version differences may require entity-based joins — will surface in CI if broken.
+- `funnel_wons` proxies via `expansion_event` — honest limitation, 3 funnel metrics marked `confidence_tier: evolving`.
+- Smoke queries may fail on empty-result edge cases (e.g., cohort_arr metrics for a cohort_month with no accounts). Will debug on CI.
+
+**Reader fan-out verdict re-check:** Still "pre-extract nothing before #1". Day 3 metric skills folder is unique to this project; the eval-shaped projects (02, 05, 06) will not reuse markdown-skill patterns from here.
+
+---
+
 ## Day 2 — 2026-10-06
 
 **Shipped (morning):**

@@ -27,11 +27,10 @@ metrics:
     type_params:
       measure: { name: quota_arr_cents_sum }
     label: "Quota ARR ($)"
-    config:
-      meta: { unit: usd, divide_by: 100 }
+    config: { meta: { unit: usd, divide_by: 100 } }
 
   - name: pipeline_coverage
-    description: Open pipeline ARR / quota ARR, grouped by team × quarter.
+    description: Open pipeline ARR / quota ARR, by team × quarter.
     type: ratio
     type_params:
       numerator: { name: open_pipeline_arr }
@@ -40,4 +39,16 @@ metrics:
     config:
       meta:
         owner: gtm-analytics@example.com
-        gotcha: "Strict open-pipeline denominator — excludes closed_won in-period. The 'QTD coverage' alternative (which includes closed_won) is deliberately not materialized here; a pipeline_coverage_qtd sibling metric lands in Day 3 per the design doc §4 adversarial-pass note."
+        gotcha: "Strict open-pipeline denominator — excludes closed_won in-period. See pipeline_coverage_qtd for the inclusive alternative."
+
+  - name: pipeline_coverage_qtd
+    description: QTD coverage = (open pipeline + closed_won in-period) / quota. Inclusive sibling of pipeline_coverage (adversarial-pass mod, design doc §4).
+    type: ratio
+    type_params:
+      numerator: { name: qtd_pipeline_arr }
+      denominator: { name: quota_arr }
+    label: "Pipeline coverage (QTD, inclusive)"
+    config:
+      meta:
+        owner: gtm-analytics@example.com
+        gotcha: "Trends UP as quarter progresses (strict pipeline_coverage trends DOWN). See skills/faq/pipeline-coverage-strict-vs-qtd.md."
