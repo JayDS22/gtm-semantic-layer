@@ -23,7 +23,7 @@ select
     (opp.stage = 'Closed Lost')                      as is_lost,
     (opp.stage not in ('Closed Won', 'Closed Lost')) as is_open,
     cast(opp.created_at as date)                     as created_date,
-    case when opp.stage in ('Closed Won', 'Closed Lost') then opp.close_date else null end as closed_date,
+    opp.close_date                                   as close_date,
     case when opp.stage in ('Closed Won', 'Closed Lost')
          then cast(opp.close_date - cast(opp.created_at as date) as integer)
          else null end                               as cycle_days
