@@ -1,0 +1,30 @@
+id,account_id,owner_user_id,name,stage,forecast_category,amount,close_date,created_at,last_modified_at
+opp_001,a_001,u_001,Acme Corp - Pro - New,Closed Won,closed,24000,2026-02-14,2025-11-02 10:14:22,2026-02-14 09:00:00
+opp_002,a_001,u_001,Acme Corp - Pro - Expansion Seats,Closed Won,closed,18000,2026-05-20,2026-03-10 14:22:00,2026-05-20 11:00:00
+opp_003,a_001,u_001,Acme Corp - Enterprise Upgrade,Negotiation,commit,96000,2026-11-15,2026-08-01 09:00:00,2026-10-02 15:30:00
+opp_004,a_002,u_002,BlueRiver Health - Starter - New,Closed Won,closed,5400,2026-01-28,2025-12-18 16:00:00,2026-01-28 10:00:00
+opp_005,a_002,u_002,BlueRiver Health - Pro - Upgrade,Proposal,best_case,30000,2026-12-20,2026-09-15 09:00:00,2026-10-01 14:00:00
+opp_006,a_003,u_003,Novanet Logistics - Enterprise - New,Closed Won,closed,180000,2026-03-10,2025-10-05 11:00:00,2026-03-10 12:00:00
+opp_007,a_003,u_003,Novanet Logistics - Enterprise - Expansion,Discovery,best_case,120000,2027-02-28,2026-09-28 10:00:00,2026-10-04 15:00:00
+opp_008,a_004,u_002,Pembroke Finance - Starter - New,Closed Lost,omitted,5400,2026-02-20,2026-01-02 09:00:00,2026-02-20 16:00:00
+opp_009,a_004,u_002,Pembroke Finance - Pro - New,Closed Won,closed,24000,2026-06-11,2026-04-12 10:00:00,2026-06-11 14:00:00
+opp_010,a_005,u_004,Granite Peak Software - Pro - New,Closed Won,closed,24000,2026-04-02,2026-01-20 09:00:00,2026-04-02 10:00:00
+opp_011,a_005,u_004,Granite Peak Software - Enterprise - Upgrade,Negotiation,commit,108000,2026-12-15,2026-08-10 11:00:00,2026-10-01 09:00:00
+opp_012,a_006,u_005,Sentinel Robotics - Enterprise - New,Closed Won,closed,240000,2026-07-01,2026-02-14 10:00:00,2026-07-01 12:00:00
+opp_013,a_006,u_005,Sentinel Robotics - Enterprise - Expansion,Proposal,commit,180000,2027-01-15,2026-08-20 09:00:00,2026-10-03 11:00:00
+opp_014,a_007,u_006,HarborWave Media - Pro - New,Closed Lost,omitted,24000,2026-05-10,2026-02-28 14:00:00,2026-05-10 10:00:00
+opp_015,a_007,u_006,HarborWave Media - Pro - New (reopen),Closed Won,closed,24000,2026-09-15,2026-07-15 10:00:00,2026-09-15 11:00:00
+opp_016,a_008,u_001,Delta Agronomics - Starter - New,Closed Won,closed,5400,2026-03-18,2026-01-28 09:00:00,2026-03-18 10:00:00
+opp_017,a_008,u_001,Delta Agronomics - Pro - Upgrade,Discovery,best_case,24000,2026-12-30,2026-09-05 11:00:00,2026-10-04 16:00:00
+opp_018,a_009,u_003,Marbury Legal - Enterprise - New,Closed Won,closed,144000,2026-05-25,2025-12-15 10:00:00,2026-05-25 12:00:00
+opp_019,a_010,u_007,Kestrel Diagnostics - Pro - New,Closed Won,closed,24000,2026-02-10,2025-11-20 09:00:00,2026-02-10 10:00:00
+opp_020,a_010,u_007,Kestrel Diagnostics - Enterprise - Upgrade,Qualification,pipeline,108000,2027-03-15,2026-10-01 14:00:00,2026-10-02 15:00:00
+opp_021,a_011,u_008,Oakshire Retail - Pro - New,Closed Won,closed,24000,2026-04-20,2026-02-10 09:00:00,2026-04-20 11:00:00
+opp_022,a_011,u_008,Oakshire Retail - Pro - Churn-Save,Closed Lost,omitted,24000,2026-08-15,2026-06-25 10:00:00,2026-08-15 14:00:00
+opp_023,a_012,u_004,Vireo Education - Starter - New,Closed Won,closed,5400,2026-01-15,2025-11-10 10:00:00,2026-01-15 11:00:00
+opp_024,a_012,u_004,Vireo Education - Pro - Upgrade,Prospecting,pipeline,24000,2027-02-28,2026-09-25 09:00:00,2026-09-25 09:00:00
+opp_025,a_013,u_006,Terrace Mobility - Pro - New,Closed Won,closed,24000,2026-06-30,2026-03-10 10:00:00,2026-06-30 12:00:00
+opp_026,a_013,u_006,Terrace Mobility - Enterprise - Expansion,Proposal,best_case,120000,2027-01-10,2026-08-05 11:00:00,2026-10-01 10:00:00
+opp_027,a_014,u_002,Whitlock Pharma - Enterprise - New,Closed Won,closed,210000,2026-08-22,2026-01-15 09:00:00,2026-08-22 11:00:00
+opp_028,a_015,u_005,Haven Ridge Energy - Pro - New,Closed Lost,omitted,24000,2026-07-05,2026-04-02 10:00:00,2026-07-05 13:00:00
+opp_029,a_015,u_005,Haven Ridge Energy - Pro - New (new rep),Negotiation,commit,24000,2026-11-30,2026-09-02 09:00:00,2026-10-03 11:00:00

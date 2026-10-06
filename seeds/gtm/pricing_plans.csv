@@ -1,0 +1,4 @@
+plan_id,plan_name,tier,base_monthly_cents,cogs_pct
+starter,Starter,SMB,45000,0.15
+pro,Pro,MM,200000,0.18
+enterprise,Enterprise,ENT,1500000,0.22

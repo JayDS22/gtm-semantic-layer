@@ -1,0 +1,16 @@
+id,name,segment,region,industry,created_at
+a_001,Acme Corp,MM,NAMER,Manufacturing,2024-05-10 10:00:00
+a_002,BlueRiver Health,SMB,NAMER,Healthcare,2025-10-15 09:00:00
+a_003,Novanet Logistics,ENT,EMEA,Logistics,2024-08-20 11:00:00
+a_004,Pembroke Finance,SMB,NAMER,Financial Services,2025-11-05 14:00:00
+a_005,Granite Peak Software,MM,NAMER,Software,2025-09-18 10:00:00
+a_006,Sentinel Robotics,ENT,APAC,Robotics,2024-11-30 09:00:00
+a_007,HarborWave Media,SMB,NAMER,Media,2025-10-28 10:00:00
+a_008,Delta Agronomics,SMB,LATAM,Agriculture,2025-11-01 09:00:00
+a_009,Marbury Legal,MM,NAMER,Legal,2025-09-15 10:00:00
+a_010,Kestrel Diagnostics,MM,EMEA,Healthcare,2025-10-10 09:00:00
+a_011,Oakshire Retail,MM,NAMER,Retail,2025-10-20 10:00:00
+a_012,Vireo Education,SMB,APAC,Education,2025-10-05 09:00:00
+a_013,Terrace Mobility,MM,EMEA,Mobility,2025-12-01 10:00:00
+a_014,Whitlock Pharma,ENT,NAMER,Pharmaceuticals,2024-10-15 09:00:00
+a_015,Haven Ridge Energy,SMB,NAMER,Energy,2026-01-10 10:00:00

@@ -1,0 +1,9 @@
+id,email,first_name,last_name,title,team,created_at
+u_001,jsmith@example.com,Jamie,Smith,Senior AE,NAMER-ENT,2023-03-15 10:00:00
+u_002,abenitez@example.com,Ana,Benitez,Senior AE,NAMER-SMB,2023-05-10 10:00:00
+u_003,rhsiung@example.com,Rachel,Hsiung,Senior AE,APAC-ENT,2024-01-20 09:00:00
+u_004,dnguyen@example.com,Devon,Nguyen,AE,NAMER-MM,2024-06-05 10:00:00
+u_005,kokeefe@example.com,Kai,OKeefe,Senior AE,NAMER-ENT,2022-11-10 10:00:00
+u_006,lschmidt@example.com,Lena,Schmidt,AE,EMEA-MM,2024-03-20 10:00:00
+u_007,pokonkwo@example.com,Pete,Okonkwo,AE,EMEA-ENT,2024-08-15 09:00:00
+u_008,sweaver@example.com,Sarah,Weaver,AE,NAMER-SMB,2024-11-01 10:00:00

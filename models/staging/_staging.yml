@@ -1,0 +1,176 @@
+version: 2
+
+sources:
+  - name: sfdc
+    description: Salesforce stub, loaded via dbt seeds under the `raw` schema.
+    schema: raw
+    tables:
+      - name: opportunities
+        identifier: sfdc_opportunities
+        columns:
+          - name: id
+            tests: [not_null, unique]
+          - name: account_id
+            tests: [not_null]
+          - name: name
+            meta: { pii: customer_identifier }
+          - name: amount
+            tests: [not_null]
+          - name: stage
+            tests: [not_null]
+          - name: forecast_category
+            tests: [not_null]
+          - name: close_date
+            tests: [not_null]
+
+      - name: accounts
+        identifier: sfdc_accounts
+        columns:
+          - name: id
+            tests: [not_null, unique]
+          - name: name
+            meta: { pii: customer_identifier }
+          - name: segment
+            tests: [not_null]
+          - name: region
+            tests: [not_null]
+
+      - name: users
+        identifier: sfdc_users
+        columns:
+          - name: id
+            tests: [not_null, unique]
+          - name: email
+            meta: { pii: direct_identifier }
+          - name: first_name
+            meta: { pii: direct_identifier }
+          - name: last_name
+            meta: { pii: direct_identifier }
+          - name: team
+            tests: [not_null]
+
+  - name: stripe
+    description: Stripe stub, loaded via dbt seeds under the `raw` schema.
+    schema: raw
+    tables:
+      - name: subscriptions
+        identifier: stripe_subscriptions
+        columns:
+          - name: subscription_id
+            tests: [not_null]
+          - name: customer_id
+            tests: [not_null]
+            meta: { pii: customer_identifier }
+          - name: plan_id
+            tests: [not_null]
+          - name: status
+            tests: [not_null]
+          - name: unit_amount
+            tests: [not_null]
+          - name: valid_from
+            tests: [not_null]
+
+      - name: customers
+        identifier: stripe_customers
+        columns:
+          - name: id
+            tests: [not_null, unique]
+          - name: email
+            meta: { pii: direct_identifier }
+          - name: account_id
+            tests: [not_null]
+            meta: { pii: customer_identifier }
+
+  - name: product
+    description: Product analytics event stub, loaded via dbt seeds under the `raw` schema.
+    schema: raw
+    tables:
+      - name: events
+        identifier: product_events
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: user_id
+            meta: { pii: direct_identifier }
+          - name: event_type
+            tests: [not_null]
+          - name: ts
+            tests: [not_null]
+
+models:
+  - name: stg_sfdc__opportunities
+    description: Opportunities, 1:1 with SFDC source. Amounts cast to cents.
+    columns:
+      - name: opportunity_id
+        tests: [not_null, unique]
+      - name: account_id
+        tests: [not_null]
+      - name: amount_cents
+        tests: [not_null]
+      - name: opportunity_name
+        meta: { pii: customer_identifier }
+
+  - name: stg_sfdc__accounts
+    description: Accounts, 1:1 with SFDC source.
+    columns:
+      - name: account_id
+        tests: [not_null, unique]
+      - name: account_name
+        meta: { pii: customer_identifier }
+      - name: segment
+        tests:
+          - not_null
+          - accepted_values:
+              values: [SMB, MM, ENT]
+
+  - name: stg_sfdc__users
+    description: Users, 1:1 with SFDC source. Email/names kept in staging but dropped at the mart boundary (see dim_user).
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: user_email
+        meta: { pii: direct_identifier }
+      - name: first_name
+        meta: { pii: direct_identifier }
+      - name: last_name
+        meta: { pii: direct_identifier }
+      - name: team
+        tests: [not_null]
+
+  - name: stg_stripe__subscriptions
+    description: Subscription status history, one row per status change. Synthetic PK = subscription_id || '|' || valid_from.
+    columns:
+      - name: subscription_event_id
+        tests: [not_null, unique]
+      - name: subscription_id
+        tests: [not_null]
+      - name: customer_id
+        tests: [not_null]
+        meta: { pii: customer_identifier }
+      - name: plan_id
+        tests: [not_null]
+      - name: unit_amount_cents
+        tests: [not_null]
+
+  - name: stg_stripe__customers
+    description: Stripe customers mapped to SFDC accounts. Email dropped at the mart boundary.
+    columns:
+      - name: customer_id
+        tests: [not_null, unique]
+      - name: customer_email
+        meta: { pii: direct_identifier }
+      - name: account_id
+        tests: [not_null]
+        meta: { pii: customer_identifier }
+
+  - name: stg_product__events
+    description: Product events, flattened from JSONL. One row per event_id.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: event_type
+        tests: [not_null]
+      - name: event_at
+        tests: [not_null]
+      - name: user_id
+        meta: { pii: direct_identifier }

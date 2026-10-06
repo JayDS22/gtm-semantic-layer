@@ -1,0 +1,116 @@
+version: 2
+
+semantic_models:
+  - name: mrr_movement
+    description: Monthly ARR movements per account per movement type. Single source of truth for ARR waterfalls.
+    model: ref('fct_mrr_movement')
+    defaults:
+      agg_time_dimension: month_date
+    entities:
+      - name: account
+        type: foreign
+        expr: account_sk
+    measures:
+      - name: arr_delta_cents
+        agg: sum
+        expr: arr_delta_cents
+      - name: new_arr_cents
+        agg: sum
+        expr: "case when movement_type = 'new' then arr_delta_cents else 0 end"
+      - name: expansion_arr_cents
+        agg: sum
+        expr: "case when movement_type = 'expansion' then arr_delta_cents else 0 end"
+      - name: contraction_arr_cents
+        agg: sum
+        expr: "case when movement_type = 'contraction' then arr_delta_cents else 0 end"
+      - name: churn_arr_cents
+        agg: sum
+        expr: "case when movement_type = 'churn' then arr_delta_cents else 0 end"
+    dimensions:
+      - name: month_date
+        type: time
+        type_params:
+          time_granularity: month
+      - name: movement_type
+        type: categorical
+
+metrics:
+  - name: arr
+    description: Annualized recurring revenue, in dollars, as of end of period. Cumulative sum of ARR deltas from start of time — this is the entire point of fct_mrr_movement.
+    type: cumulative
+    type_params:
+      measure:
+        name: arr_delta_cents
+    label: "ARR ($)"
+    config:
+      meta:
+        unit: usd
+        divide_by: 100
+        owner: gtm-analytics@example.com
+
+  - name: mrr
+    description: Monthly recurring revenue at end of period (= ARR / 12).
+    type: derived
+    type_params:
+      expr: arr / 12
+      metrics:
+        - name: arr
+    label: "MRR ($)"
+    config:
+      meta:
+        unit: usd
+        divide_by: 100
+
+  - name: new_arr
+    description: New ARR added in the period, in dollars.
+    type: simple
+    type_params:
+      measure:
+        name: new_arr_cents
+    label: "New ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: expansion_arr
+    description: Expansion ARR in the period, in dollars.
+    type: simple
+    type_params:
+      measure:
+        name: expansion_arr_cents
+    label: "Expansion ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: contraction_arr
+    description: Contraction ARR in the period (negative), in dollars.
+    type: simple
+    type_params:
+      measure:
+        name: contraction_arr_cents
+    label: "Contraction ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: churn_arr
+    description: Churn ARR in the period (negative), in dollars.
+    type: simple
+    type_params:
+      measure:
+        name: churn_arr_cents
+    label: "Churn ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: net_new_arr
+    description: Net new ARR = new + expansion + contraction + churn (contraction and churn are already signed negative via the movement classification).
+    type: derived
+    type_params:
+      expr: new_arr + expansion_arr + contraction_arr + churn_arr
+      metrics:
+        - name: new_arr
+        - name: expansion_arr
+        - name: contraction_arr
+        - name: churn_arr
+    label: "Net New ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100, owner: gtm-analytics@example.com }

@@ -1,0 +1,38 @@
+name: 'anthropic_gtm_semantic_layer'
+version: '0.1.0'
+config-version: 2
+profile: 'gtm'
+
+model-paths: ["models"]
+seed-paths:  ["seeds"]
+test-paths:  ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  anthropic_gtm_semantic_layer:
+    gtm:
+      +schema: raw
+      +quote_columns: false
+
+models:
+  anthropic_gtm_semantic_layer:
+    staging:
+      +materialized: view
+      +tags: ["staging"]
+    intermediate:
+      +materialized: ephemeral
+      +tags: ["intermediate"]
+    marts:
+      +materialized: table
+      +tags: ["marts"]
+      core:
+        +schema: core
+
+vars:
+  pii_tag_prefix: "pii."
+  fiscal_year_start_month: 2

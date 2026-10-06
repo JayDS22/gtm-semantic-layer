@@ -1,0 +1,19 @@
+id,email,account_id,created_at
+cust_001,finance@acme.example,a_001,2025-11-02 10:14:22
+cust_002,admin@blueriver.example,a_002,2026-01-28 10:00:00
+cust_003,ap@novanet.example,a_003,2025-10-05 11:00:00
+cust_004,finance@pembroke.example,a_004,2026-06-11 14:00:00
+cust_005,admin@granitepeak.example,a_005,2026-04-02 10:00:00
+cust_006,billing@sentinel.example,a_006,2026-07-01 12:00:00
+cust_007,ops@harborwave.example,a_007,2026-09-15 11:00:00
+cust_008,finance@deltaagro.example,a_008,2026-03-18 10:00:00
+cust_009,admin@marbury.example,a_009,2026-05-25 12:00:00
+cust_010,billing@kestrel.example,a_010,2026-02-10 10:00:00
+cust_011,finance@oakshire.example,a_011,2026-04-20 11:00:00
+cust_012,admin@vireo.example,a_012,2026-01-15 11:00:00
+cust_013,ops@terrace.example,a_013,2026-06-30 12:00:00
+cust_014,finance@whitlock.example,a_014,2026-08-22 11:00:00
+cust_015,admin@havenridge.example,a_015,2026-04-15 10:00:00
+cust_016,legacy@orphan1.example,a_pre_sfdc_006,2024-03-10 10:00:00
+cust_017,test@orphan2.example,a_test_dedupe,2025-07-15 11:00:00
+cust_018,legacy@orphan3.example,a_pre_sfdc_018,2024-12-01 10:00:00

@@ -1,0 +1,45 @@
+version: 2
+
+semantic_models:
+  - name: quota
+    description: Sales quota per team per quarter, in cents.
+    model: ref('fct_quota')
+    defaults:
+      agg_time_dimension: quarter_start
+    entities:
+      - name: team
+        type: primary
+        expr: team
+    measures:
+      - name: quota_arr_cents_sum
+        agg: sum
+        expr: quota_arr_cents
+    dimensions:
+      - name: quarter_start
+        type: time
+        type_params:
+          time_granularity: quarter
+      - name: team
+        type: categorical
+
+metrics:
+  - name: quota_arr
+    description: Total quota in the period, in dollars.
+    type: simple
+    type_params:
+      measure: { name: quota_arr_cents_sum }
+    label: "Quota ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: pipeline_coverage
+    description: Open pipeline ARR / quota ARR, grouped by team × quarter.
+    type: ratio
+    type_params:
+      numerator: { name: open_pipeline_arr }
+      denominator: { name: quota_arr }
+    label: "Pipeline coverage"
+    config:
+      meta:
+        owner: gtm-analytics@example.com
+        gotcha: "Strict open-pipeline denominator — excludes closed_won in-period. The 'QTD coverage' alternative (which includes closed_won) is deliberately not materialized here; a pipeline_coverage_qtd sibling metric lands in Day 3 per the design doc §4 adversarial-pass note."

@@ -1,0 +1,50 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Setup profiles.yml
+        run: cp profiles.yml.example profiles.yml
+
+      - name: dbt deps
+        run: dbt deps --profiles-dir .
+
+      - name: dbt seed
+        run: dbt seed --profiles-dir .
+
+      - name: dbt build
+        run: dbt build --profiles-dir .
+
+      - name: MetricFlow validate-configs
+        run: mf validate-configs --profiles-dir .
+
+      - name: Metric smoke queries
+        run: |
+          mf query --profiles-dir . --metrics arr          --group-by metric_time__month
+          mf query --profiles-dir . --metrics net_new_arr  --group-by metric_time__month
+          mf query --profiles-dir . --metrics win_rate     --group-by metric_time__quarter,owner_team
+          mf query --profiles-dir . --metrics pipeline_coverage --group-by metric_time__quarter,team
+
+      - name: SQL lint
+        run: sqlfluff lint models/ --dialect duckdb
+        continue-on-error: true

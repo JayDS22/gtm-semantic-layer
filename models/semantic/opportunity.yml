@@ -1,0 +1,90 @@
+version: 2
+
+semantic_models:
+  - name: opportunity
+    description: One row per opportunity (current state). Facts for win_rate, pipeline_coverage, avg_sales_cycle, and the funnel metrics that join through account.
+    model: ref('fct_opportunity')
+    defaults:
+      agg_time_dimension: close_date
+    entities:
+      - name: opportunity
+        type: primary
+        expr: opportunity_sk
+      - name: account
+        type: foreign
+        expr: account_sk
+      - name: user
+        type: foreign
+        expr: user_sk
+      - name: team
+        type: foreign
+        expr: owner_team
+    measures:
+      - name: n_won
+        agg: sum
+        expr: "case when is_won then 1 else 0 end"
+      - name: n_lost
+        agg: sum
+        expr: "case when is_lost then 1 else 0 end"
+      - name: n_closed
+        agg: sum
+        expr: "case when is_won or is_lost then 1 else 0 end"
+      - name: open_pipeline_arr_cents
+        agg: sum
+        expr: "case when is_open and forecast_category in ('pipeline','best_case','commit') then arr_cents else 0 end"
+    dimensions:
+      - name: close_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: created_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: stage
+        type: categorical
+      - name: forecast_category
+        type: categorical
+      - name: owner_team
+        type: categorical
+
+metrics:
+  - name: won_opps
+    description: Count of won opportunities by close date.
+    type: simple
+    type_params:
+      measure: { name: n_won }
+    label: "Won opps"
+
+  - name: lost_opps
+    description: Count of lost opportunities by close date.
+    type: simple
+    type_params:
+      measure: { name: n_lost }
+    label: "Lost opps"
+
+  - name: closed_opps
+    description: Count of closed opportunities (won + lost) by close date.
+    type: simple
+    type_params:
+      measure: { name: n_closed }
+    label: "Closed opps"
+
+  - name: open_pipeline_arr
+    description: Sum of ARR on OPEN opportunities whose forecast_category is in (pipeline, best_case, commit), grouped by close date. Deliberately excludes closed_won — see pipeline_coverage gotcha.
+    type: simple
+    type_params:
+      measure: { name: open_pipeline_arr_cents }
+    label: "Open pipeline ARR ($)"
+    config:
+      meta: { unit: usd, divide_by: 100 }
+
+  - name: win_rate
+    description: Won opps / (won + lost opps). Natural grain = team × close_date (default rolled to quarter).
+    type: ratio
+    type_params:
+      numerator: { name: won_opps }
+      denominator: { name: closed_opps }
+    label: "Win rate"
+    config:
+      meta: { owner: gtm-analytics@example.com }

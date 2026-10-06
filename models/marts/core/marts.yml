@@ -1,0 +1,106 @@
+version: 2
+
+models:
+  - name: dim_account
+    description: One row per current account. Day 2 ships as straight dim (is_current = true for all); Day 4 flips to SCD2 via dbt snapshot per design doc §2.1.
+    columns:
+      - name: account_sk
+        tests: [not_null, unique]
+      - name: account_id
+        tests: [not_null, unique]
+      - name: account_name
+        meta: { pii: customer_identifier }
+      - name: segment
+        tests:
+          - not_null
+          - accepted_values:
+              values: [SMB, MM, ENT]
+      - name: region
+        tests: [not_null]
+
+  - name: dim_user
+    description: User dim with PII dropped at the mart boundary (see dim_user.sql).
+    columns:
+      - name: user_sk
+        tests: [not_null, unique]
+      - name: user_id
+        tests: [not_null, unique]
+      - name: team
+        tests: [not_null]
+
+  - name: dim_plan
+    columns:
+      - name: plan_sk
+        tests: [not_null, unique]
+      - name: plan_id
+        tests: [not_null, unique]
+      - name: tier
+        tests:
+          - not_null
+          - accepted_values:
+              values: [SMB, MM, ENT]
+
+  - name: dim_date
+    description: Day spine 2025-01-01 through 2027-12-31 inclusive.
+    columns:
+      - name: calendar_date
+        tests: [not_null, unique]
+
+  - name: dim_customer
+    description: Stripe customer dim mapped to SFDC account. Orphan customers have null account_sk; int_account_hierarchy_reconciliation surfaces them.
+    columns:
+      - name: customer_sk
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null, unique]
+
+  - name: fct_opportunity
+    description: One row per opportunity (current state).
+    columns:
+      - name: opportunity_sk
+        tests: [not_null, unique]
+      - name: opportunity_id
+        tests: [not_null, unique]
+      - name: account_sk
+        tests:
+          - relationships:
+              to: ref('dim_account')
+              field: account_sk
+      - name: stage
+        tests: [not_null]
+      - name: arr_cents
+        tests: [not_null]
+
+  - name: fct_mrr_movement
+    description: One row per account × month × movement_type. Single canonical source for ARR waterfalls.
+    tests:
+      - assert_grain:
+          columns: [account_sk, month_date, movement_type]
+    columns:
+      - name: account_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_account')
+              field: account_sk
+      - name: month_date
+        tests: [not_null]
+      - name: movement_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: [new, expansion, contraction, churn, reactivation]
+      - name: arr_delta_cents
+        tests: [not_null]
+
+  - name: fct_quota
+    description: Sales quota by team × quarter.
+    columns:
+      - name: quota_sk
+        tests: [not_null, unique]
+      - name: team
+        tests: [not_null]
+      - name: quarter_start
+        tests: [not_null]
+      - name: quota_arr_cents
+        tests: [not_null]

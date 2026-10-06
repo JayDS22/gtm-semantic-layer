@@ -1,0 +1,18 @@
+gtm:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ./target/gtm.duckdb
+      threads: 4
+      schema: main
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'ANALYST') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'GTM') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'XS') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'GTM') }}"
+      threads: 8
