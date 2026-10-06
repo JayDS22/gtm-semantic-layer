@@ -42,7 +42,7 @@ jobs:
         run: |
           mf query --metrics arr              --group-by metric_time__month
           mf query --metrics net_new_arr      --group-by metric_time__month
-          mf query --metrics win_rate         --group-by metric_time__quarter,owner_team
+          mf query --metrics win_rate         --group-by metric_time__quarter,opportunity__owner_team
           mf query --metrics pipeline_coverage --group-by metric_time__quarter,team
 
       - name: SQL lint
