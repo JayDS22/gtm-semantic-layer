@@ -45,8 +45,8 @@ jobs:
         run: |
           mf query --metrics arr                   --group-by metric_time__month
           mf query --metrics net_new_arr           --group-by metric_time__month
-          mf query --metrics nrr                   --group-by metric_time__month,cohort_arr__cohort_month
-          mf query --metrics logo_retention        --group-by metric_time__month,cohort_arr__cohort_month
+          mf query --metrics nrr                   --group-by metric_time__month,cohort_arr_row__cohort_month__month
+          mf query --metrics logo_retention        --group-by metric_time__month,cohort_arr_row__cohort_month__month
           mf query --metrics win_rate              --group-by metric_time__quarter,opportunity__owner_team
           mf query --metrics pipeline_coverage     --group-by metric_time__quarter,team
           mf query --metrics pipeline_coverage_qtd --group-by metric_time__quarter,team
