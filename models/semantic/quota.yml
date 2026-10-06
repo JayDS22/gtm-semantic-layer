@@ -19,8 +19,6 @@ semantic_models:
         type: time
         type_params:
           time_granularity: quarter
-      - name: team
-        type: categorical
 
 metrics:
   - name: quota_arr

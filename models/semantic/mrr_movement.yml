@@ -4,6 +4,7 @@ semantic_models:
   - name: mrr_movement
     description: Monthly ARR movements per account per movement type. Single source of truth for ARR waterfalls.
     model: ref('fct_mrr_movement')
+    primary_entity: mrr_movement_row
     defaults:
       agg_time_dimension: month_date
     entities:
