@@ -121,7 +121,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: [SMB, MM, ENT]
+              arguments:
+                values: [SMB, MM, ENT]
 
   - name: stg_sfdc__users
     description: Users, 1:1 with SFDC source. Email/names kept in staging but dropped at the mart boundary (see dim_user).

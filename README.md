@@ -1,4 +1,4 @@
-# anthropic-gtm-semantic-layer
+# gtm-semantic-layer
 
 Governed, self-service GTM analytics stack built on dbt-core + MetricFlow + DuckDB/Snowflake, with a versioned `skills/` folder consumed by Claude-style assistants.
 

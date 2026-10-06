@@ -1,4 +1,4 @@
-name: 'anthropic_gtm_semantic_layer'
+name: 'gtm_semantic_layer'
 version: '0.1.0'
 config-version: 2
 profile: 'gtm'
@@ -14,13 +14,13 @@ clean-targets:
   - "dbt_packages"
 
 seeds:
-  anthropic_gtm_semantic_layer:
+  gtm_semantic_layer:
     gtm:
       +schema: raw
       +quote_columns: false
 
 models:
-  anthropic_gtm_semantic_layer:
+  gtm_semantic_layer:
     staging:
       +materialized: view
       +tags: ["staging"]

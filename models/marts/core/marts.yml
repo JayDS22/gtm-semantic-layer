@@ -14,7 +14,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: [SMB, MM, ENT]
+              arguments:
+                values: [SMB, MM, ENT]
       - name: region
         tests: [not_null]
 
@@ -38,12 +39,16 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: [SMB, MM, ENT]
+              arguments:
+                values: [SMB, MM, ENT]
 
   - name: dim_date
-    description: Day spine 2025-01-01 through 2027-12-31 inclusive.
+    description: Day spine 2025-01-01 through 2028-01-01 (exclusive). Declared as the MetricFlow time spine for the project.
+    time_spine:
+      standard_granularity_column: calendar_date
     columns:
       - name: calendar_date
+        granularity: day
         tests: [not_null, unique]
 
   - name: dim_customer
@@ -64,8 +69,9 @@ models:
       - name: account_sk
         tests:
           - relationships:
-              to: ref('dim_account')
-              field: account_sk
+              arguments:
+                to: ref('dim_account')
+                field: account_sk
       - name: stage
         tests: [not_null]
       - name: arr_cents
@@ -75,21 +81,24 @@ models:
     description: One row per account × month × movement_type. Single canonical source for ARR waterfalls.
     tests:
       - assert_grain:
-          columns: [account_sk, month_date, movement_type]
+          arguments:
+            columns: [account_sk, month_date, movement_type]
     columns:
       - name: account_sk
         tests:
           - not_null
           - relationships:
-              to: ref('dim_account')
-              field: account_sk
+              arguments:
+                to: ref('dim_account')
+                field: account_sk
       - name: month_date
         tests: [not_null]
       - name: movement_type
         tests:
           - not_null
           - accepted_values:
-              values: [new, expansion, contraction, churn, reactivation]
+              arguments:
+                values: [new, expansion, contraction, churn, reactivation]
       - name: arr_delta_cents
         tests: [not_null]
 
