@@ -8,7 +8,7 @@ up: install
 	dbt deps --profiles-dir .
 	dbt seed --profiles-dir .
 	dbt build --profiles-dir .
-	mf validate-configs --profiles-dir .
+	mf validate-configs
 
 build:
 	dbt build --profiles-dir .
@@ -18,10 +18,10 @@ test:
 
 # usage: make q METRIC=nrr GROUP=metric_time__month,cohort__cohort_month
 q:
-	mf query --profiles-dir . --metrics $(METRIC) $(if $(GROUP),--group-by $(GROUP),)
+	mf query --metrics $(METRIC) $(if $(GROUP),--group-by $(GROUP),)
 
 serve-mf:
-	mf tutorial --profiles-dir .
+	mf tutorial
 
 lint:
 	sqlfluff lint models/
