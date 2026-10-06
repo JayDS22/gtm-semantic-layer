@@ -10,7 +10,7 @@ update_cadence: quarterly
 related_skills: [magic-number, cac-payback-months, net-new-arr]
 ---
 
-# Burn Multiple — Capital Efficiency
+# Burn Multiple, Capital Efficiency
 
 ## One-liner
 Dollars burned per dollar of ARR added. Less than 1 is strong; 1-2 is typical for growth-stage SaaS; greater than 2 is a warning threshold. Popularized by Craft Ventures as the single best capital-efficiency metric for private SaaS.
@@ -20,7 +20,7 @@ Dollars burned per dollar of ARR added. Less than 1 is strong; 1-2 is typical fo
 Net cash burn in the period divided by net new ARR added in the same period.
 
 ## Dimensions you can slice by
-- `metric_time__quarter` — the standard reporting grain
+- `metric_time__quarter`, the standard reporting grain
 
 ## How to query
 `mf query --metrics burn_multiple --group-by metric_time__quarter`

@@ -8,7 +8,7 @@ update_cadence: on_change
 related_skills: [pipeline-coverage, pipeline-coverage-qtd, win-rate]
 ---
 
-# Pipeline coverage — strict vs QTD
+# Pipeline coverage, strict vs QTD
 
 Two coverage definitions circulate in SaaS, and your sales leadership probably argues about which is "right". We ship both deliberately (adversarial-pass §4).
 
@@ -17,7 +17,7 @@ Two coverage definitions circulate in SaaS, and your sales leadership probably a
 Numerator = `open_pipeline_arr` (open opps with forecast_category ∈ pipeline/best_case/commit).
 Denominator = `quota_arr`.
 
-**Trends DOWN as the quarter progresses** — as deals close, open pipeline shrinks. This is the forward-looking view: "do we have enough runway to still hit?"
+**Trends DOWN as the quarter progresses**, as deals close, open pipeline shrinks. This is the forward-looking view: "do we have enough runway to still hit?"
 
 Industry rule-of-thumb: ≥3x at quarter start is healthy; ≥1x by mid-quarter is usually required to hit.
 
@@ -26,7 +26,7 @@ Industry rule-of-thumb: ≥3x at quarter start is healthy; ≥1x by mid-quarter 
 Numerator = `qtd_pipeline_arr` (open + closed_won in-period).
 Denominator = `quota_arr`.
 
-**Trends UP as the quarter progresses** — closed deals accumulate. This is the attainment view: "where are we vs quota, including progress so far?"
+**Trends UP as the quarter progresses**, closed deals accumulate. This is the attainment view: "where are we vs quota, including progress so far?"
 
 Industry rule-of-thumb: ≥1x by end of quarter = quota hit.
 

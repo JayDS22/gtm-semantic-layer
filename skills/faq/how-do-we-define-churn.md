@@ -21,7 +21,7 @@ In `int_subscription_mrr_daily`, we only densify days where `status in ('active'
 - **past_due.** Still counts as paying for MRR purposes. If the account's status eventually flips to `canceled`, that transition is when it churns.
 - **trialing.** Was never paying; cancellation of a trial is not churn, there's just no `new` yet.
 - **Downgrade to a cheaper plan.** That's `contraction`, not churn.
-- **Downgrade to zero-dollar plan.** Edge case — our seeds don't have one; policy decision is churn, pending Day 4+ when a `is_free_plan` flag lands.
+- **Downgrade to zero-dollar plan.** Edge case, our seeds don't have one; policy decision is churn, pending Day 4+ when a `is_free_plan` flag lands.
 
 ## Reactivation
 

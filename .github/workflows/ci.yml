@@ -41,6 +41,14 @@ jobs:
       - name: Skill ⇄ metric crosswalk
         run: python scripts/skill_metric_crosswalk.py
 
+      - name: PII policy check (manifest walk)
+        run: python scripts/pii_check.py
+        continue-on-error: true
+
+      - name: Skill freshness (warn >90d)
+        run: python scripts/skill_freshness.py --max-days 90
+        continue-on-error: true
+
       - name: Metric smoke queries
         run: |
           mf query --metrics arr                   --group-by metric_time__month

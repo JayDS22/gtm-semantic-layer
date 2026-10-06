@@ -10,7 +10,7 @@ update_cadence: monthly
 related_skills: [arr, expansion-rate, nrr-cohort-attribution]
 ---
 
-# NRR — Net Revenue Retention
+# NRR, Net Revenue Retention
 
 ## One-liner
 For a cohort of accounts that were paying at month t0, NRR is the share of that cohort's ARR we still have today, including expansion from those same accounts but excluding any ARR from accounts that joined after t0.
@@ -21,10 +21,10 @@ For a cohort of accounts that were paying at month t0, NRR is the share of that 
 Numerator and denominator both sum over the SAME set of accounts (the ones in the cohort at t0). This is the whole point.
 
 ## Dimensions you can slice by
-- `cohort_month` — the t0 month of the cohort
-- `segment` — SMB / MM / ENT
-- `region` — NAMER / EMEA / APAC / LATAM
-- `plan` — the plan the account was on at t0 (NOT the current plan)
+- `cohort_month`, the t0 month of the cohort
+- `segment`, SMB / MM / ENT
+- `region`, NAMER / EMEA / APAC / LATAM
+- `plan`, the plan the account was on at t0 (NOT the current plan)
 
 ## How to query
 `mf query --metrics nrr --group-by metric_time__month,cohort_arr__cohort_month`

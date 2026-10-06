@@ -14,7 +14,7 @@ Why an opportunity moved backward in stage (Negotiation → Discovery, Proposal 
 
 ## The current data limitation
 
-`fct_opportunity` is a **current-state** fact — one row per opp at today's state. `int_opportunity_history` is a passthrough today (not SCD2). This means we **cannot detect stage regressions from this warehouse alone** until the dbt snapshot on `stg_sfdc__opportunities` lands (Day 4+).
+`fct_opportunity` is a **current-state** fact, one row per opp at today's state. `int_opportunity_history` is a passthrough today (not SCD2). This means we **cannot detect stage regressions from this warehouse alone** until the dbt snapshot on `stg_sfdc__opportunities` lands (Day 4+).
 
 Until then, stage regressions must be inferred from SFDC audit history or diff'd between consecutive dbt runs.
 

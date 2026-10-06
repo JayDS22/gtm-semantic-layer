@@ -34,4 +34,4 @@ related_skills: [arr, mrr]
 
 ## Common mistake
 
-Someone pulls "revenue" from the finance system and compares to ARR. These are different numbers. ARR is a run-rate; revenue is recognized GAAP revenue — multi-year prepaid deals land in ARR instantly but recognize revenue over time.
+Someone pulls "revenue" from the finance system and compares to ARR. These are different numbers. ARR is a run-rate; revenue is recognized GAAP revenue, multi-year prepaid deals land in ARR instantly but recognize revenue over time.

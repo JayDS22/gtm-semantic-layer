@@ -10,10 +10,10 @@ update_cadence: monthly
 related_skills: [net-new-arr, expansion-rate, nrr]
 ---
 
-# New ARR — Brand-New-Logo ARR
+# New ARR, Brand-New-Logo ARR
 
 ## One-liner
-ARR added by brand-new logos in the period — the first-paid-month contribution from accounts that had no prior paying history.
+ARR added by brand-new logos in the period, the first-paid-month contribution from accounts that had no prior paying history.
 
 ## Formula
 `new_arr = sum(arr_delta_cents where movement_type = 'new')` over the period.
@@ -21,9 +21,9 @@ ARR added by brand-new logos in the period — the first-paid-month contribution
 Divide by 100 for dollars. The `movement_type = 'new'` filter is pre-applied in the semantic model.
 
 ## Dimensions you can slice by
-- `segment` — SMB / MM / ENT (via `account` entity join)
-- `region` — NAMER / EMEA / APAC / LATAM
-- `movement_type` — already filtered to `'new'`, but exposed for consistency with other movement metrics
+- `segment`, SMB / MM / ENT (via `account` entity join)
+- `region`, NAMER / EMEA / APAC / LATAM
+- `movement_type`, already filtered to `'new'`, but exposed for consistency with other movement metrics
 
 ## How to query
 `mf query --metrics new_arr --group-by metric_time__month,account__segment`
