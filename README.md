@@ -46,13 +46,30 @@ Seeds → staging (PII-tagged, source-tested) → intermediate (incremental MRR 
 
 Full table with grain, formula, dimensions, and `confidence_tier` in [`docs/metric-glossary.md`](docs/metric-glossary.md). Honest tiers: `cac_payback_months` and `rule_of_40` ship as `draft` (blended CAC not segment-weighted; Rule-of-40 operating-margin component only). The 3 funnel conversions ship as `evolving` (same-period proxy aggregation, true per-user cohort tracking is Day 5+).
 
+## Walkthrough
+
+![demo](docs/img/demo.gif)
+
+Scripted terminal demo rendered via [charmbracelet/vhs](https://github.com/charmbracelet/vhs) from `.vhs/demo.tape`. No live recording; re-render after any user-facing change with `vhs .vhs/demo.tape`.
+
+Static captures (same source, individual frames):
+
+![mf query output](docs/img/mf-query-output.png)
+`mf query --metrics arr --group-by metric_time__month` returning ARR by month from the live DuckDB warehouse.
+
+![skills tree](docs/img/skills-tree.png)
+`tree skills/` showing the 22 metric files + 3 debug runbooks + 4 FAQs under their standard categories.
+
+CI status: the green badge at the top of this README is live from GitHub Actions on the `main` branch.
+
 ## Status
 
 - [x] Day 1, Skeleton, seeds, staging, source YAML, CI green
 - [x] Day 2, Marts + first 5 metrics
 - [x] Day 3, Remaining 15 metrics + skills folder + CI crosswalk
 - [x] Day 4, PII enforcement + 4 singular tests + skill freshness + docs
-- [ ] Day 5, Screenshots, Loom walkthrough, public announcement
+- [x] Day 5, segment-weighted CAC payback (stable), demo GIF via vhs, screenshots, repo public
+- [ ] Day 6+, resume + application link, Rule-of-40 growth term, SCD2 opportunity snapshot
 
 ## Attribution
 

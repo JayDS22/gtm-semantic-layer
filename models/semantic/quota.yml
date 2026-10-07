@@ -39,7 +39,7 @@ metrics:
     config:
       meta:
         owner: gtm-analytics@example.com
-        gotcha: "Strict open-pipeline denominator — excludes closed_won in-period. See pipeline_coverage_qtd for the inclusive alternative."
+        gotcha: "Strict open-pipeline denominator, excludes closed_won in-period. See pipeline_coverage_qtd for the inclusive alternative."
 
   - name: pipeline_coverage_qtd
     description: QTD coverage = (open pipeline + closed_won in-period) / quota. Inclusive sibling of pipeline_coverage (adversarial-pass mod, design doc §4).

@@ -12,10 +12,10 @@ required:
   - update_cadence    # weekly | monthly | quarterly | on_change
 
 optional:
-  - dimensions        # list[string] — safe grouping dims for the assistant
-  - related_skills    # list[string] — kebab-case ids pointing at other files
+  - dimensions        # list[string], safe grouping dims for the assistant
+  - related_skills    # list[string], kebab-case ids pointing at other files
 
 enforcement:
-  - scripts/skill_metric_crosswalk.py — every mf metric must have a
+  - scripts/skill_metric_crosswalk.py, every mf metric must have a
     skills/metrics/<id>.md and vice versa (via metric_id frontmatter)
-  - scripts/skill_freshness.py (Day 4+) — warn if last_reviewed_at > 90d
+  - scripts/skill_freshness.py (Day 4+), warn if last_reviewed_at > 90d

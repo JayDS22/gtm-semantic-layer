@@ -2,7 +2,7 @@ version: 2
 
 semantic_models:
   - name: cohort_arr
-    description: Cohort-static ARR aggregation. One row per (cohort_month × reporting_month). Powers NRR, GRR, expansion rate, and logo retention — all with cohort-static attribution (new logos acquired in-period do NOT backfill prior cohorts).
+    description: Cohort-static ARR aggregation. One row per (cohort_month × reporting_month). Powers NRR, GRR, expansion rate, and logo retention, all with cohort-static attribution (new logos acquired in-period do NOT backfill prior cohorts).
     model: ref('fct_cohort_arr_monthly')
     primary_entity: cohort_arr_row
     defaults:
@@ -78,7 +78,7 @@ metrics:
     label: "Cohort logo count at reporting month (still paying)"
 
   - name: nrr
-    description: Net revenue retention. cohort_now_arr / cohort_t0_arr. Cohort-static attribution — expansion from NEW logos in-period is NOT credited here.
+    description: Net revenue retention. cohort_now_arr / cohort_t0_arr. Cohort-static attribution, expansion from NEW logos in-period is NOT credited here.
     type: ratio
     type_params:
       numerator: { name: cohort_now_arr }

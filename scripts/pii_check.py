@@ -3,19 +3,19 @@
 PII policy enforcement from target/manifest.json (design doc §2.8).
 
 Checks:
-  (a) walk-and-warn — staging columns with meta.pii should propagate the tag
+  (a) walk-and-warn, staging columns with meta.pii should propagate the tag
       to downstream mart columns derived from them. True column-lineage needs
       the catalog, so Day 4 prints info findings and never fails.
-  (b) HARD — no mart column may carry meta.pii = 'direct_identifier' unless
+  (b) HARD, no mart column may carry meta.pii = 'direct_identifier' unless
       meta.pii_opt_in is truthy.
-  (c) HARD — every semantic_model dimension must resolve to a mart column
+  (c) HARD, every semantic_model dimension must resolve to a mart column
       whose pii level is in {None, 'customer_identifier'} (or lower). Direct
       identifiers never reach the semantic layer.
 
 Exit codes:
-  0  — clean
-  1  — (b) or (c) violation
-  2  — manifest.json missing (run `dbt parse` first)
+  0 , clean
+  1 , (b) or (c) violation
+  2 , manifest.json missing (run `dbt parse` first)
 """
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def _col_opt_in(col: dict[str, Any]) -> bool:
 
 
 def _is_mart(node: dict[str, Any]) -> bool:
-    # dbt marts conventionally live under models/marts/… — fall back to
+    # dbt marts conventionally live under models/marts/…, fall back to
     # fqn[1] == 'marts' which is stable regardless of file layout.
     fqn = node.get("fqn") or []
     return len(fqn) >= 2 and fqn[1] == "marts"
@@ -92,7 +92,7 @@ def check_semantic_dimensions(manifest: dict[str, Any]) -> list[str]:
             col_name = (dim.get("expr") or dim.get("name") or "").strip()
             col = cols.get(col_name)
             if not col:
-                # Dimension doesn't resolve to a documented mart column —
+                # Dimension doesn't resolve to a documented mart column , 
                 # can't verify, let it pass. The crosswalk / dbt compile
                 # catches genuine missing refs.
                 continue
@@ -135,7 +135,7 @@ def walk_and_warn_propagation(nodes: dict[str, Any]) -> list[str]:
                 findings.append(
                     f"{node['unique_id']}.{cname}: upstream staging tagged "
                     f"pii='{staging_tagged[cname]}', mart column has no "
-                    f"meta.pii — consider propagating"
+                    f"meta.pii, consider propagating"
                 )
     return findings
 

@@ -1,6 +1,6 @@
 -- Classify product events to funnel stages, attach account_sk.
 -- The product user_id namespace is separate from sfdc_users.id, so dim_user
--- is intentionally not joined — funnel analytics happen at account grain.
+-- is intentionally not joined, funnel analytics happen at account grain.
 
 with evt as (
     select * from {{ ref('stg_product__events') }}

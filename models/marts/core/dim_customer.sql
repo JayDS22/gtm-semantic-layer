@@ -1,6 +1,6 @@
 -- PII policy: customer_email dropped at this mart boundary.
 -- Orphan stripe customers (no matching SFDC account) carry a null
--- account_sk — fct_mrr_movement filters them out so their MRR does not
+-- account_sk, fct_mrr_movement filters them out so their MRR does not
 -- roll up to any account. int_account_hierarchy_reconciliation surfaces
 -- these as warnings in CI.
 

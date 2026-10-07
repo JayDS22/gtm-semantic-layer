@@ -7,7 +7,7 @@
 --   logo_retention = cohort_logo_now     / cohort_logo_t0
 --
 -- Attribution semantics (adversarial-pass gotcha, see skills/metrics/nrr.md):
---   - cohort is STATIC — accounts that join a new logo mid-period do NOT get
+--   - cohort is STATIC, accounts that join a new logo mid-period do NOT get
 --     attributed to any prior cohort
 --   - cohort_t0_arr is the sum of each account's ARR as of its cohort_month,
 --     frozen for that cohort forever

@@ -1,6 +1,6 @@
 -- PII policy: email/first_name/last_name are tagged `direct_identifier` in
 -- staging and intentionally dropped at this mart boundary. The semantic layer
--- can slice by user_sk, title, team, is_internal — never by name/email.
+-- can slice by user_sk, title, team, is_internal, never by name/email.
 
 select
     {{ dbt_utils.generate_surrogate_key(['user_id']) }} as user_sk,

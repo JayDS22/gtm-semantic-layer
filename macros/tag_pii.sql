@@ -6,7 +6,7 @@
 
     Levels: direct_identifier, indirect_identifier, customer_identifier, sensitive_attribute.
 
-    Usage in schema.yml (jinja is NOT evaluated in YAML — this macro is
+    Usage in schema.yml (jinja is NOT evaluated in YAML, this macro is
     documentation + a central place to add validation when needed;
     columns use plain `meta: { pii: ... }` for now):
       columns:

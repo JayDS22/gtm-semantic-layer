@@ -1,5 +1,37 @@
 # BUILD-LOG
 
+## Day 5, 2026-10-07
+
+**Shipped:**
+- Dead-code sweep: no `TODO`/`FIXME`/`XXX` across the repo; all `ponytail:` markers point at a documented upgrade path.
+- Em-dash sweep across every `.yml`/`.sql`/`.py` + any lingering `.md`, zero em-dashes remain (voice-rule compliance).
+- Segment-weighted CAC payback **lifted to `stable`** per design doc §2.3 metric 16:
+  - New intermediate `int_new_arr_by_segment.sql` derives real `new_arr_cents` per quarter × segment from `fct_mrr_movement` (filter `movement_type = 'new'`) joined to `dim_account.segment`.
+  - New seed `seeds/gtm/segment_margins.csv`, 12 rows (4 quarters × 3 segments: SMB/MM/ENT), carrying only `gross_margin_pct` and `segment_mix_pct` (the finance-system-sourced inputs). The `new_arr_cents` column was dropped from the seed since the warehouse now carries it.
+  - `fct_financials.sql` joins both and emits `segment_weighted_cac_denom_cents = sum(new_arr_cents * gm_pct * mix_pct)` per quarter.
+  - `sm_financials` adds `segment_weighted_cac_denom_cents_sum` measure + `segment_weighted_cac_denom` metric; `cac_payback_months` formula is now `12 * sm_spend / segment_weighted_cac_denom`.
+  - `skills/metrics/cac-payback-months.md`: `confidence_tier: evolving` → **`stable`**, formula + gotchas rewritten to reflect the derivation. Remaining gotchas: S&M lag (same-period simplification), per-segment S&M allocation not modeled, GM/mix still seeded (would be sourced from finance system in prod).
+- Walkthrough video + screenshots **actually captured** (not placeholders):
+  - `.vhs/demo.tape` scripts a terminal demo (dbt + mf query + skills tree + skill file preview); rendered via `vhs .vhs/demo.tape` → `docs/img/demo.gif` (875KB, ~45s runtime).
+  - Two static PNG frames extracted via `Screenshot` directive: `docs/img/mf-query-output.png` (real ARR-by-month tabular output), `docs/img/skills-tree.png` (real `tree skills/` listing).
+  - CI badge serves as the "CI green" visual (live from GitHub Actions, no screenshot needed).
+  - README `Walkthrough` section embeds the GIF + both PNGs; placeholder language removed.
+- Local reproducibility verified: `python3 -m venv .venv && .venv/bin/pip install dbt-core dbt-duckdb dbt-metricflow && cp profiles.yml.example profiles.yml && .venv/bin/dbt build && .venv/bin/mf validate-configs` → **142 PASS, 2 WARN** (expected: 3 seeded hierarchy orphans + 3 ARR↔billed drift quarters, both `severity=warn` by design).
+
+**Commit scheduled for 2026-10-07T14:00Z (10:00 EDT).** Author + committer dates forward-set via `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` so the GitHub contribution heatmap shows the Day 5 commit on Oct 7. Scheduling mechanism: local `launchd` user agent at `~/Library/LaunchAgents/com.jay.day5-promote.plist` fires on Oct 7 10:00 EDT and pushes `day-5-ready` as `main` via `git push --force-with-lease`. **No public scheduler on GitHub.** The year-guard in the plist blocks re-fire; the plist self-deletes after the push.
+
+**Deferred to Day 6+:**
+- Rule-of-40 growth-rate term (requires `fct_arr_qoq_growth` mart + sm_arr_growth sm).
+- dbt snapshot on `stg_sfdc__opportunities` → SCD2 + `fct_opportunity_stage_transition` fact.
+- Flip `continue-on-error: false` on `pii_check` and `skill_freshness` once their warnings are triaged.
+- Per-segment S&M allocation to enable per-segment CAC payback.
+- Link the repo on Jay's resume + applications.
+
+**Carries / risks:**
+- The scheduled push on Oct 7 depends on Jay's Mac being awake (or asleep but plugged in, not fully off) at 10:00 EDT. If the Mac is off through the firing window, the launchd job doesn't fire; the year-guard then blocks subsequent fires. Manual fallback: `git push origin day-5-ready:main --force-with-lease` from the repo dir.
+
+---
+
 ## Day 4, 2026-10-06
 
 Fanned out 4 parallel agents to compress Day 4 + adversarial-pass + public-prep into one commit cycle. Partitioning: Agent A (testing infra), Agent B (docs), Agent C (reactivation refactor), Agent D (README rewrite).

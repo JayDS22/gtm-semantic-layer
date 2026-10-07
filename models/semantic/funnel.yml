@@ -78,7 +78,7 @@ metrics:
     label: "Funnel wons (proxy via expansion events)"
 
   - name: mql_to_sql_conv
-    description: SQLs over MQLs in the same cohort period. Rough proxy — real cohort tracking requires joining each user's MQL event to their SQL event (may be weeks apart). Day 4+.
+    description: SQLs over MQLs in the same cohort period. Rough proxy, real cohort tracking requires joining each user's MQL event to their SQL event (may be weeks apart). Day 4+.
     type: ratio
     type_params:
       numerator: { name: funnel_sqls }
@@ -86,7 +86,7 @@ metrics:
     label: "MQL→SQL conv rate"
 
   - name: sql_to_won_conv
-    description: Wons over SQLs in the same cohort period. Proxy — funnel_wons uses expansion_event as a stand-in since product events don't yet join to fct_opportunity.
+    description: Wons over SQLs in the same cohort period. Proxy, funnel_wons uses expansion_event as a stand-in since product events don't yet join to fct_opportunity.
     type: ratio
     type_params:
       numerator: { name: funnel_wons }

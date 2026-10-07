@@ -26,6 +26,9 @@ semantic_models:
       - name: operating_margin_pct_avg
         agg: average
         expr: operating_margin_pct
+      - name: segment_weighted_cac_denom_cents_sum
+        agg: sum
+        expr: segment_weighted_cac_denom_cents
     dimensions:
       - name: quarter_start
         type: time
@@ -73,6 +76,14 @@ metrics:
       measure: { name: operating_margin_pct_avg }
     label: "Operating margin pct"
 
+  - name: segment_weighted_cac_denom
+    description: "Segment-weighted CAC denominator = sum(new_arr_s * gm_s * mix_s across SMB/MM/ENT). Computed in fct_financials via join to segment_margins seed."
+    type: simple
+    type_params:
+      measure: { name: segment_weighted_cac_denom_cents_sum }
+    label: "Segment-weighted CAC denominator"
+    config: { meta: { unit: usd, divide_by: 100 } }
+
   - name: gross_profit
     description: Revenue minus COGS.
     type: derived
@@ -85,7 +96,7 @@ metrics:
     config: { meta: { unit: usd, divide_by: 100 } }
 
   - name: gross_margin
-    description: (revenue − cogs) / revenue. The computed ratio.
+    description: "(revenue - cogs) / revenue. The computed ratio."
     type: ratio
     type_params:
       numerator: { name: gross_profit }
@@ -93,7 +104,7 @@ metrics:
     label: "Gross margin"
 
   - name: magic_number
-    description: Simplified SaaS magic number — net_new_arr × 4 / sm_spend. Textbook is (ARR_Q − ARR_{Q-1}) × 4 / S&M_{Q-1} (lag the S&M); we use same-period S&M for Day 3 simplicity.
+    description: "Simplified SaaS magic number: net_new_arr * 4 / sm_spend. Textbook is (ARR_Q - ARR_{Q-1}) * 4 / S&M_{Q-1} (lag the S&M); we use same-period S&M for simplicity."
     type: derived
     type_params:
       expr: net_new_arr * 4.0 / nullif(sm_spend, 0)
@@ -103,7 +114,7 @@ metrics:
     label: "Magic number"
 
   - name: burn_multiple
-    description: net_burn / net_new_arr. Lower is better; >2 is a warning threshold.
+    description: "net_burn / net_new_arr. Lower is better; >2 is a warning threshold."
     type: derived
     type_params:
       expr: 1.0 * net_burn / nullif(net_new_arr, 0)
@@ -113,21 +124,20 @@ metrics:
     label: "Burn multiple"
 
   - name: cac_payback_months
-    description: Blended CAC payback — 12 × sm_spend / (new_arr × gross_margin_pct). The design-doc §2.3 metric 16 formula is segment-weighted (per-segment GM × segment mix); Day 3 ships blended because per-segment GM and mix seeds don't exist yet.
+    description: "Day 5 segment-weighted CAC payback per design doc 2.3 metric 16. Formula: 12 * sm_spend / sum(new_arr_s * gm_s * mix_s across segments), where segment_weighted_cac_denom is pre-aggregated in fct_financials from the segment_margins seed. Still evolving (not stable): the segment-level new_arr/GM/mix are seeded placeholders; Day 6+ derives new_arr by segment from fct_mrr_movement joined to dim_account.segment."
     type: derived
     type_params:
-      expr: 12.0 * sm_spend / nullif(new_arr * gross_margin_pct_metric, 0)
+      expr: 12.0 * sm_spend / nullif(segment_weighted_cac_denom, 0)
       metrics:
         - { name: sm_spend }
-        - { name: new_arr }
-        - { name: gross_margin_pct_metric }
-    label: "CAC payback (months)"
+        - { name: segment_weighted_cac_denom }
+    label: "CAC payback (months, segment-weighted)"
 
   - name: rule_of_40
-    description: Day 3 simplification — operating_margin_pct × 100 ONLY. The real metric adds trailing-12-month ARR growth as a percent; growth-rate-as-metric requires a fct_arr_qoq_growth mart (Day 4+). Under-reports growing-but-unprofitable companies.
+    description: "Day 3 simplification: operating_margin_pct * 100 ONLY. The real metric adds trailing-12-month ARR growth as a percent; growth-rate-as-metric requires a fct_arr_qoq_growth mart (Day 6+). Under-reports growing-but-unprofitable companies."
     type: derived
     type_params:
       expr: operating_margin_pct_metric * 100.0
       metrics:
         - { name: operating_margin_pct_metric }
-    label: "Rule of 40 (partial — operating margin only)"
+    label: "Rule of 40 (partial, operating margin only)"

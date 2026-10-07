@@ -43,7 +43,7 @@ def main() -> int:
             skill_files[mid] = p.name
 
     # Orphan check only: every skill file must map to a real mf metric.
-    # We do NOT require every mf metric to have a skill file — many are
+    # We do NOT require every mf metric to have a skill file, many are
     # supporting metrics (new_arr, cohort_*, won_opps, etc.) consumed only
     # by derived/ratio parents. Only the "public" ones (per design doc §1.5)
     # get skill files.

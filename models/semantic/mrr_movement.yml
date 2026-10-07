@@ -37,7 +37,7 @@ semantic_models:
 
 metrics:
   - name: arr
-    description: Annualized recurring revenue, in dollars, as of end of period. Cumulative sum of ARR deltas from start of time — this is the entire point of fct_mrr_movement.
+    description: Annualized recurring revenue, in dollars, as of end of period. Cumulative sum of ARR deltas from start of time, this is the entire point of fct_mrr_movement.
     type: cumulative
     type_params:
       measure:
