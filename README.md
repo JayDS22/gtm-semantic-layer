@@ -48,6 +48,22 @@ Full table with grain, formula, dimensions, and `confidence_tier` in [`docs/metr
 
 ## Walkthrough
 
+### The ask-Claude pattern
+
+![ask-Claude demo](docs/img/ask-claude-demo.gif)
+
+A plain-English GTM question routed through the `skills/` folder to a deterministic MetricFlow query. The script at [`scripts/ask_claude.py`](scripts/ask_claude.py) stands in for the LLM step (keyword scorer over the 23 skill cards) so you can see the control flow without an API key; in production the scorer is any model that can rank skill files. The emitted `mf query` command and the returned tabular output are the real contract.
+
+Try it locally after `make up`:
+
+```bash
+./scripts/ask_claude.py "show ARR trending by month" --run
+./scripts/ask_claude.py "NRR by cohort monthly" --run
+./scripts/ask_claude.py "rule of 40 by quarter" --run
+```
+
+### Stack walkthrough (dbt build + mf query + skills tree)
+
 ![demo](docs/img/demo.gif)
 
 Scripted terminal demo rendered via [charmbracelet/vhs](https://github.com/charmbracelet/vhs) from `.vhs/demo.tape`. No live recording; re-render after any user-facing change with `vhs .vhs/demo.tape`.
@@ -70,7 +86,8 @@ CI status: the green badge at the top of this README is live from GitHub Actions
 - [x] Day 4, PII enforcement + 4 singular tests + skill freshness + docs
 - [x] Day 5, segment-weighted CAC payback (stable), demo GIF via vhs, screenshots, repo public
 - [x] Day 6, Rule-of-40 growth term (stable), pii_check + skill_freshness CI gates flipped to blocking
-- [ ] Day 7+, resume + application link, SCD2 opportunity snapshot, YoY growth once >= 5 quarters of history
+- [x] Day 7, ask-Claude pattern demo (scripts/ask_claude.py + .vhs/ask-claude.tape) + README embed
+- [ ] Day 8+, SCD2 opportunity snapshot, YoY growth once >= 5 quarters of history, resume + application link
 
 ## Attribution
 

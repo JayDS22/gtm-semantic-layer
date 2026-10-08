@@ -1,5 +1,26 @@
 # BUILD-LOG
 
+## Day 7, 2026-10-08
+
+**Shipped:**
+- `scripts/ask_claude.py` — minimal reference impl of the "skills/-folder consumption" pattern. Takes a plain-English GTM question, scans the 23 metric cards in `skills/metrics/`, picks the right one via a token-weighted scorer (metric_id tokens weighted 50x over body co-mentions, with a missing-token penalty so `arr` beats `new_arr` when "new" isn't asked for), resolves grain + group-by from question hints (quarter/month/week + cohort), and either prints the resolved `mf query` command (dry-run) or shells out to run it (`--run`). Routing verified across 6 varied questions: `arr`, `new_arr`, `net_new_arr`, `rule_of_40`, `cac_payback_months`, `nrr` all resolve correctly. Cohort queries auto-cap at `--limit 12` so dense cohort × month grids stay readable in demo output.
+- `.vhs/ask-claude.tape` — scripted terminal demo that walks through 3 questions (ARR trending, NRR by cohort, Rule-of-40 by quarter) end-to-end. Renders to `docs/img/ask-claude-demo.gif` (494KB, ~55s). No human recording required; re-renders with `vhs .vhs/ask-claude.tape` after any script or skill change.
+- README `Walkthrough` section restructured with the ask-Claude demo FIRST (headline differentiator) and the original stack-walkthrough demo second. Added copy-pasteable local-reproduction snippet pointing at the 3 demo questions.
+- Status checklist: Day 7 checkbox + Day 8+ deferred list (SCD2 snapshot, YoY growth, resume + application link).
+
+**Why this matters:** the Day 1-6 version of the repo had a terminal demo proving "the stack runs" but no artifact proving "an LLM can consume this cleanly." The ask-Claude pattern is the differentiating narrative on the repo (dbt + MetricFlow + LLM-era governance via skill cards), and until Day 7 it only existed in prose. Now it's executable, reproducible, and visually demo-able in a 60-second GIF embedded at the top of the walkthrough.
+
+**Local verification:** `./scripts/ask_claude.py "..."` dry-runs clean for all 6 test questions; `--run` executes against the local DuckDB warehouse and returns real tabular data (ARR by month, NRR cohort × month capped at 12 rows, Rule-of-40 showing the Q1-Q3 2026 real values 45.3 / 1714.67 / 1107.82). vhs render succeeds; ffmpeg frame extraction confirms the demo renders through all 3 questions with the ask-Claude flow + mf-query output visible.
+
+**Deferred to Day 8+:**
+- Replace keyword scorer with an actual LLM call (optional, requires API key env var — the current approach is production-realistic since the scorer is the swappable component, not the control flow).
+- SCD2 opportunity snapshot (dbt snapshot on `stg_sfdc__opportunities`).
+- YoY growth-rate term in `rule_of_40` once >= 5 quarters of warehouse history.
+- Finish `hex-gtm-dashboard` in hex.tech, swap `TBD` for live URL.
+- Link the repo on Jay's resume + Anthropic application.
+
+---
+
 ## Day 6, 2026-10-07
 
 **Shipped:**
