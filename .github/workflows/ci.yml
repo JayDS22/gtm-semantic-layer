@@ -43,11 +43,9 @@ jobs:
 
       - name: PII policy check (manifest walk)
         run: python scripts/pii_check.py
-        continue-on-error: true
 
       - name: Skill freshness (warn >90d)
         run: python scripts/skill_freshness.py --max-days 90
-        continue-on-error: true
 
       - name: Metric smoke queries
         run: |
@@ -61,6 +59,8 @@ jobs:
           mf query --metrics activation_rate       --group-by metric_time__week
           mf query --metrics cac_payback_months    --group-by metric_time__quarter
           mf query --metrics gross_margin          --group-by metric_time__quarter
+          mf query --metrics rule_of_40            --group-by metric_time__quarter
+          mf query --metrics arr_qoq_annualized_growth_pct --group-by metric_time__quarter
 
       - name: SQL lint
         run: sqlfluff lint models/ --dialect duckdb

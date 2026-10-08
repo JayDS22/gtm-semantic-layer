@@ -1,6 +1,6 @@
 # Metric Glossary
 
-The 22 public metrics in this project, grouped by domain. Formulas are
+The 23 public metrics in this project, grouped by domain. Formulas are
 sketches, the authoritative definitions live in `models/semantic/*.yml`
 and the user-facing explanations live in `skills/metrics/<id>.md`.
 
@@ -25,6 +25,7 @@ Confidence tiers reflect the labels on the skill files themselves:
 | `net_new_arr` | `new_arr + expansion_arr + contraction_arr + churn_arr` | `mrr_movement` | account × month | movement_type | stable | `skills/metrics/net-new-arr.md` |
 | `grr` | `cohort_retained_arr / cohort_t0_arr` (retained = min(curr, t0) per account) | `cohort_arr` | cohort_month × reporting_month | cohort_month | stable | `skills/metrics/grr.md` |
 | `nrr` | `cohort_now_arr / cohort_t0_arr` (cohort-static) | `cohort_arr` | cohort_month × reporting_month | cohort_month, segment, region, plan | stable | `skills/metrics/nrr.md` |
+| `arr_qoq_annualized_growth_pct` | `(1 + (ARR_q − ARR_{q-1}) / ARR_{q-1})^4 − 1` (QoQ-annualized; see skill for the YoY tradeoff) | `arr_growth` | quarter | metric_time__quarter | stable | `skills/metrics/arr-qoq-growth-pct.md` |
 
 ## Pipeline
 
@@ -56,13 +57,13 @@ Confidence tiers reflect the labels on the skill files themselves:
 
 | Metric | Formula sketch | Semantic model | Grain | Key dimensions | Confidence | Skill file |
 |---|---|---|---|---|---|---|
-| `cac_payback_months` | `12 × sm_spend / (new_arr × gross_margin_pct)` (blended, not segment-weighted) | `financials` + `mrr_movement` | quarter |, | draft | `skills/metrics/cac-payback-months.md` |
+| `cac_payback_months` | `12 × sm_spend / sum(new_arr_s × gm_s × mix_s across segments)` (segment-weighted, real new_arr by segment) | `financials` + `mrr_movement` + `segment_margins` seed | quarter |, | stable | `skills/metrics/cac-payback-months.md` |
 | `magic_number` | `net_new_arr × 4 / sm_spend` (same-period; textbook lags S&M by one quarter) | `financials` + `mrr_movement` | quarter |, | evolving | `skills/metrics/magic-number.md` |
 | `burn_multiple` | `net_burn / net_new_arr` | `financials` + `mrr_movement` | quarter |, | evolving | `skills/metrics/burn-multiple.md` |
 | `gross_margin` | `(revenue − cogs) / revenue` | `financials` | quarter |, | stable | `skills/metrics/gross-margin.md` |
-| `rule_of_40` | `operating_margin_pct × 100` (missing the ARR-growth term) | `financials` | quarter |, | draft | `skills/metrics/rule-of-40.md` |
+| `rule_of_40` | `(arr_qoq_annualized_growth_pct + operating_margin_pct) × 100` (growth + margin) | `financials` + `arr_growth` | quarter |, | stable | `skills/metrics/rule-of-40.md` |
 
-## Note on the 22 public / ~30 supporting split
+## Note on the 23 public / ~30 supporting split
 
 The semantic layer defines roughly 50 metrics. Only 22 of them get skill
 files and show up in this glossary. The rest are **supporting metrics** , 

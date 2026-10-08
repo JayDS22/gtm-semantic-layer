@@ -134,10 +134,11 @@ metrics:
     label: "CAC payback (months, segment-weighted)"
 
   - name: rule_of_40
-    description: "Day 3 simplification: operating_margin_pct * 100 ONLY. The real metric adds trailing-12-month ARR growth as a percent; growth-rate-as-metric requires a fct_arr_qoq_growth mart (Day 6+). Under-reports growing-but-unprofitable companies."
+    description: "Bessemer's growth + profitability shorthand: (ARR growth %) + (operating margin %). Should sum to >= 40 for a healthy SaaS. Growth term uses QoQ-annualized ARR growth from fct_arr_qoq_growth; see skills/metrics/rule-of-40.md for the YoY-vs-QoQ convention tradeoff."
     type: derived
     type_params:
-      expr: operating_margin_pct_metric * 100.0
+      expr: (arr_qoq_annualized_growth_pct + operating_margin_pct_metric) * 100.0
       metrics:
+        - { name: arr_qoq_annualized_growth_pct }
         - { name: operating_margin_pct_metric }
-    label: "Rule of 40 (partial, operating margin only)"
+    label: "Rule of 40 (growth + margin)"

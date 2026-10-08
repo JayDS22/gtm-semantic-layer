@@ -1,0 +1,26 @@
+version: 2
+
+semantic_models:
+  - name: arr_growth
+    description: Quarter-end total ARR with QoQ-annualized growth rate. Powers rule_of_40 growth term.
+    model: ref('fct_arr_qoq_growth')
+    primary_entity: arr_growth_row
+    defaults:
+      agg_time_dimension: quarter_start
+    measures:
+      - name: arr_qoq_annualized_growth_pct_avg
+        agg: average
+        expr: arr_qoq_annualized_growth_pct
+    dimensions:
+      - name: quarter_start
+        type: time
+        type_params:
+          time_granularity: quarter
+
+metrics:
+  - name: arr_qoq_annualized_growth_pct
+    description: "QoQ ARR growth annualized: (1 + qoq)^4 - 1. Null for the first quarter of history. See skills/metrics/arr-qoq-growth-pct.md for the YoY-vs-QoQ-annualized tradeoff."
+    type: simple
+    type_params:
+      measure: { name: arr_qoq_annualized_growth_pct_avg }
+    label: "ARR QoQ annualized growth"

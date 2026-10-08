@@ -140,6 +140,14 @@ models:
       - name: revenue_cents
         tests: [not_null]
 
+  - name: fct_arr_qoq_growth
+    description: Quarter-end total ARR with YoY growth rate. Powers the growth-rate term of rule_of_40.
+    columns:
+      - name: quarter_start
+        tests: [not_null, unique]
+      - name: arr_cents
+        tests: [not_null]
+
   - name: fct_cohort_arr_monthly
     description: Cohort-static ARR aggregation. One row per (cohort_month × reporting_month).
     tests:

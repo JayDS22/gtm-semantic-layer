@@ -1,5 +1,34 @@
 # BUILD-LOG
 
+## Day 6, 2026-10-07
+
+**Shipped:**
+- `rule_of_40` **lifted from `draft` to `stable`**. The Day 3 version carried only the operating-margin term (`operating_margin_pct * 100`) which under-reported growing-but-unprofitable SaaS by 50-150 pts. Day 6 adds the growth-rate term so the metric is now Bessemer's canonical `(growth + margin)`.
+  - New mart `fct_arr_qoq_growth.sql`: quarter-end total ARR (sum of per-account ARR at the last observed month of the quarter) + QoQ-annualized growth rate `(1 + qoq)^4 - 1`. Partial quarters (where the third month has not been observed) are filtered out via `qe.quarter_end_month >= quarter_start + 2 months`.
+  - New semantic model `models/semantic/arr_growth.yml` with measure `arr_qoq_annualized_growth_pct_avg` and simple metric `arr_qoq_annualized_growth_pct` wired to `fct_arr_qoq_growth`.
+  - `rule_of_40` formula rewrite: `(arr_qoq_annualized_growth_pct + operating_margin_pct_metric) * 100.0`. Metric label flipped from "Rule of 40 (partial, operating margin only)" to "Rule of 40 (growth + margin)".
+- Growth-rate convention: picked **QoQ-annualized**, not YoY. Reason: the demo seed carries 4 complete quarters, YoY needs 5. Production deployments with >= 5 quarters of warehouse history should flip to YoY for cross-company benchmarking. Documented in `skills/metrics/arr-qoq-growth-pct.md` (new skill file) and `skills/metrics/rule-of-40.md` (gotcha #1).
+- New skill file `skills/metrics/arr-qoq-growth-pct.md`, `confidence_tier: stable`. Covers formula, YoY-vs-QoQ-annualized tradeoff, partial-quarter filter, hypergrowth distortion caveat.
+- `rule_of_40` skill rewritten: `confidence_tier` **flipped `draft` -> `stable`**. Gotchas now cover growth-rate convention, operating-margin convention (GAAP vs FCF), first-quarter null, hypergrowth distortion. Related skills now include `arr-qoq-growth-pct`.
+- CI gates **flipped from warn-only to blocking**:
+  - `pii_check` (manifest walk): `continue-on-error: true` removed. Current state verified clean (3 INFO propagation suggestions, 0 direct_identifier leaks, 0 semantic leaks, exit 0).
+  - `skill_freshness`: `continue-on-error: true` removed. Current state verified clean (0 stale files, 30 scanned, 90-day threshold, exit 0).
+  - Repo now enforces the PII + freshness policy its own skill files preach.
+- Two new smoke queries added to CI: `rule_of_40 --group-by metric_time__quarter` and `arr_qoq_annualized_growth_pct --group-by metric_time__quarter`.
+
+**Verified local build:** `dbt build` -> **PASS=146 WARN=2 ERROR=0** (2 WARNs are the pre-existing `severity: warn` ARR-vs-billed drift + 3 account-hierarchy orphans from the demo seed, both expected). `mf validate-configs` zero errors. All 3 CI-gate Python scripts exit 0.
+
+**Known Day-5-era bug caught during Day 6:** The Day 5 CSV schema change (segment_margins.csv dropped the `new_arr_cents` column) only works on fresh warehouse state. Local incremental re-runs against the pre-Day-5 5-column warehouse table fail with a DuckDB CSV sniffer error. CI greens because every run creates fresh state. Workaround for anyone running locally: `dbt seed --select segment_margins --full-refresh --profiles-dir .` once. Not fixing in CI since CI is already clean.
+
+**Deferred to Day 7+:**
+- Flip `rule_of_40` growth term from QoQ-annualized to YoY once >= 5 quarters of warehouse history exist.
+- Propagate `meta.pii` on `dim_user.user_id`, `dim_customer.customer_id`, `dim_account.account_id` to clear the 3 INFO lines from `pii_check` (they're informational, not failures, so this is cosmetic).
+- dbt snapshot on `stg_sfdc__opportunities` -> SCD2 + `fct_opportunity_stage_transition` fact.
+- Per-segment S&M allocation to enable per-segment CAC payback.
+- Link the repo on Jay's resume + applications.
+
+---
+
 ## Day 5, 2026-10-07
 
 **Shipped:**
