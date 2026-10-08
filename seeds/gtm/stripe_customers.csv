@@ -17,3 +17,15 @@ cust_015,admin@havenridge.example,a_015,2026-04-15 10:00:00
 cust_016,legacy@orphan1.example,a_pre_sfdc_006,2024-03-10 10:00:00
 cust_017,test@orphan2.example,a_test_dedupe,2025-07-15 11:00:00
 cust_018,legacy@orphan3.example,a_pre_sfdc_018,2024-12-01 10:00:00
+cust_019,finance@monarchindustrial.example,a_016,2026-10-05 09:00:00
+cust_020,finance@lumendiagnostics.example,a_017,2026-10-18 10:00:00
+cust_021,finance@ashfordlogistics.example,a_018,2026-11-12 09:00:00
+cust_022,finance@vellumeducation.example,a_019,2026-11-28 10:00:00
+cust_023,finance@crescentpayments.example,a_020,2026-12-15 09:00:00
+cust_024,finance@northgaterobotics.example,a_021,2027-01-20 10:00:00
+cust_025,finance@beaconretailgroup.example,a_022,2027-02-10 09:00:00
+cust_026,finance@thornwoodpharma.example,a_023,2027-03-05 10:00:00
+cust_027,finance@fieldstoneagronomics.example,a_024,2027-04-15 09:00:00
+cust_028,finance@verdantenergy.example,a_025,2027-05-22 10:00:00
+cust_029,finance@ironridgemobility.example,a_026,2027-07-10 09:00:00
+cust_030,finance@larkfieldmedia.example,a_027,2027-09-01 10:00:00
